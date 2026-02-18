@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About Keshav</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>About Me</h1>
+      <p class="subtitle">A quick overview of who I am and what I enjoy building.</p>
+    </header>
+
+    <nav>
+      <a href="/">Home</a>
+      <a href="/about/" aria-current="page">About Me</a>
+      <a href="/skills/">Skills</a>
+      <a href="/src/Keshav%20Pillarisetti%20-%20Resume.pdf" download>Download Resume</a>
+      <button class="theme-toggle" type="button" id="themeToggle">Switch to dark mode</button>
+    </nav>
+
+    <main>
+      <section class="hero">
+        <h2>My Background</h2>
+        <p>I'm passionate about solving real-world problems with technology. I love combining technical depth with creative execution to deliver solutions that are both useful and delightful.</p>
+      </section>
+
+      <section class="grid">
+        <article class="card">
+          <h3>What Drives Me</h3>
+          <p>Curiosity, craftsmanship, and helping people through better digital experiences.</p>
+        </article>
+        <article class="card">
+          <h3>How I Work</h3>
+          <p>Collaborative, iterative, and quality-focused from idea to launch.</p>
+        </article>
+      </section>
+    </main>
+
+    <footer>
+      <p>Contact me via email: <a href="mailto:pkeshav.business@gmail.com">pkeshav.business@gmail.com</a></p>
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      const root = document.documentElement;
+      const btn = document.getElementById('themeToggle');
+      const saved = localStorage.getItem('theme');
+      const preferredDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const theme = saved || (preferredDark ? 'dark' : 'light');
+      root.setAttribute('data-theme', theme);
+      btn.textContent = theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode';
+
+      btn.addEventListener('click', function () {
+        const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        root.setAttribute('data-theme', next);
+        localStorage.setItem('theme', next);
+        btn.textContent = next === 'dark' ? 'Switch to light mode' : 'Switch to dark mode';
+      });
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Keshav's Skills</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Skills & Projects</h1>
+      <p class="subtitle">The tools and strengths I bring to each project.</p>
+    </header>
+
+    <nav>
+      <a href="/">Home</a>
+      <a href="/about/">About Me</a>
+      <a href="/skills/" aria-current="page">Skills</a>
+      <a href="/src/Keshav%20Pillarisetti%20-%20Resume.pdf" download>Download Resume</a>
+      <button class="theme-toggle" type="button" id="themeToggle">Switch to dark mode</button>
+    </nav>
+
+    <main>
+      <section class="hero">
+        <h2>Professional Skills</h2>
+        <p>I work across design, development, and delivery. Here are a few areas where I can add immediate value.</p>
+      </section>
+
+      <section class="grid">
+        <article class="card">
+          <h3>Frontend Development</h3>
+          <ul>
+            <li>Responsive HTML/CSS interfaces</li>
+            <li>Clean, readable component structure</li>
+            <li>Performance-conscious UI decisions</li>
+          </ul>
+        </article>
+        <article class="card">
+          <h3>Backend & Logic</h3>
+          <ul>
+            <li>API integration and data handling</li>
+            <li>Practical debugging and testing habits</li>
+            <li>Reliable feature implementation</li>
+          </ul>
+        </article>
+        <article class="card">
+          <h3>Project Mindset</h3>
+          <ul>
+            <li>Clear communication and documentation</li>
+            <li>Iterative improvements based on feedback</li>
+            <li>Focus on user outcomes</li>
+          </ul>
+        </article>
+      </section>
+    </main>
+
+    <footer>
+      <p>Contact me via email: <a href="mailto:pkeshav.business@gmail.com">pkeshav.business@gmail.com</a></p>
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      const root = document.documentElement;
+      const btn = document.getElementById('themeToggle');
+      const saved = localStorage.getItem('theme');
+      const preferredDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const theme = saved || (preferredDark ? 'dark' : 'light');
+      root.setAttribute('data-theme', theme);
+      btn.textContent = theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode';
+
+      btn.addEventListener('click', function () {
+        const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        root.setAttribute('data-theme', next);
+        localStorage.setItem('theme', next);
+        btn.textContent = next === 'dark' ? 'Switch to light mode' : 'Switch to dark mode';
+      });
+    })();
+  </script>
+</body>
+</html>
