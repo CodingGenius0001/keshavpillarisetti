@@ -3,38 +3,36 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>About Keshav</title>
+  <title>Keshav Pillarisetti | About</title>
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
   <div class="container">
     <header>
-      <h1>About Me</h1>
-      <p class="subtitle">A quick overview of who I am and what I enjoy building.</p>
+      <h1>Keshav Pillarisetti</h1>
+      <p class="subtitle">Portfolio</p>
     </header>
 
     <nav>
       <a href="/">Home</a>
-      <a href="/about/" aria-current="page">About Me</a>
+      <a href="/about/" aria-current="page">About</a>
       <a href="/skills/">Skills</a>
-      <a href="/src/Keshav%20Pillarisetti%20-%20Resume.pdf" download>Download Resume</a>
-      <button class="theme-toggle" type="button" id="themeToggle">Switch to dark mode</button>
     </nav>
 
     <main>
       <section class="hero">
-        <h2>My Background</h2>
-        <p>I'm passionate about solving real-world problems with technology. I love combining technical depth with creative execution to deliver solutions that are both useful and delightful.</p>
+        <h2>About Me</h2>
+        <p>I'm passionate about solving real-world problems with technology and creating solutions that are simple, useful, and polished.</p>
       </section>
 
       <section class="grid">
         <article class="card">
           <h3>What Drives Me</h3>
-          <p>Curiosity, craftsmanship, and helping people through better digital experiences.</p>
+          <p>Curiosity, craftsmanship, and delivering meaningful user experiences.</p>
         </article>
         <article class="card">
           <h3>How I Work</h3>
-          <p>Collaborative, iterative, and quality-focused from idea to launch.</p>
+          <p>Collaborative, iterative, and quality-focused from concept to deployment.</p>
         </article>
       </section>
     </main>
@@ -44,23 +42,7 @@
     </footer>
   </div>
 
-  <script>
-    (function () {
-      const root = document.documentElement;
-      const btn = document.getElementById('themeToggle');
-      const saved = localStorage.getItem('theme');
-      const preferredDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      const theme = saved || (preferredDark ? 'dark' : 'light');
-      root.setAttribute('data-theme', theme);
-      btn.textContent = theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode';
-
-      btn.addEventListener('click', function () {
-        const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-        root.setAttribute('data-theme', next);
-        localStorage.setItem('theme', next);
-        btn.textContent = next === 'dark' ? 'Switch to light mode' : 'Switch to dark mode';
-      });
-    })();
-  </script>
+  <button id="themeToggleFab" class="theme-fab" type="button" aria-label="Toggle color theme">🌙</button>
+  <script src="/script.js"></script>
 </body>
 </html>

@@ -1,60 +1,50 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
-<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Keshav's Portfolio</title>
+  <title>Keshav Pillarisetti | Portfolio</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <div class="container">
     <header>
-      <h1>Keshav's Portfolio</h1>
-      <p class="subtitle">Building meaningful products at the intersection of creativity and technology.</p>
+      <h1>Keshav Pillarisetti</h1>
+      <p class="subtitle">Portfolio</p>
     </header>
 
     <nav>
       <a href="/" aria-current="page">Home</a>
-      <a href="/about/">About Me</a>
+      <a href="/about/">About</a>
       <a href="/skills/">Skills</a>
-      <a href="/src/Keshav%20Pillarisetti%20-%20Resume.pdf" download>Download Resume</a>
-      <button class="theme-toggle" type="button" id="themeToggle">Switch to dark mode</button>
-      <a href="index.html" aria-current="page">Home</a>
-      <a href="about.html">About Me</a>
-      <a href="skills.html">Skills</a>
     </nav>
 
     <main>
       <section class="hero">
-        <h2>Hi, I'm Keshav 👋</h2>
-        <p>I enjoy transforming ideas into practical, polished digital experiences. Explore my background, capabilities, and projects to see the kind of work I love doing.</p>
-        <div class="cta-row">
-          <a class="button primary" href="/skills/">View Skills & Projects</a>
-          <a class="button secondary" href="/about/">Learn About Me</a>
-          <a class="button secondary" href="/src/Keshav%20Pillarisetti%20-%20Resume.pdf" download>Download Resume</a>
-        <p>
-          I enjoy transforming ideas into practical, polished digital experiences. Explore my background,
-          capabilities, and projects to see the kind of work I love doing.
-        </p>
-        <div class="cta-row">
-          <a class="button primary" href="skills.html">View Skills & Projects</a>
-          <a class="button secondary" href="about.html">Learn About Me</a>
+        <div class="profile-wrap">
+          <img class="profile-photo" src="/assets/profile-placeholder.svg" alt="Profile picture of Keshav Pillarisetti">
+          <p class="full-name">Keshav Pillarisetti</p>
         </div>
+        <h2>Hi, welcome!</h2>
+        <p>I build thoughtful, user-friendly digital experiences by combining creativity with practical engineering.</p>
       </section>
 
       <section class="grid" aria-label="Highlights">
         <article class="card">
-          <h3>User-Centered Design</h3>
-          <p>I focus on clarity, accessibility, and intuitive user journeys.</p>
+          <h3>About</h3>
+          <p>Learn more about my background, interests, and approach to building products.</p>
         </article>
         <article class="card">
-          <h3>Full-Stack Thinking</h3>
-          <p>I bridge frontend polish with solid backend logic and data flow.</p>
+          <h3>Skills</h3>
+          <p>Explore my frontend, backend, and project delivery capabilities.</p>
+          <a class="resume-link" href="/src/Keshav%20Pillarisetti%20-%20Resume.pdf" download>
+            <span class="resume-icon" aria-hidden="true">⬇️</span>
+            <span>Download Resume</span>
+          </a>
         </article>
         <article class="card">
-          <h3>Continuous Learning</h3>
-          <p>I keep growing through hands-on experimentation and iteration.</p>
+          <h3>Contact</h3>
+          <p>Reach me directly for internships, collaborations, or project discussions.</p>
         </article>
       </section>
     </main>
@@ -64,26 +54,7 @@
     </footer>
   </div>
 
-  <script>
-    (function () {
-      const root = document.documentElement;
-      const btn = document.getElementById('themeToggle');
-      const saved = localStorage.getItem('theme');
-      const preferredDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      const theme = saved || (preferredDark ? 'dark' : 'light');
-      root.setAttribute('data-theme', theme);
-      btn.textContent = theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode';
-
-      btn.addEventListener('click', function () {
-        const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-        root.setAttribute('data-theme', next);
-        localStorage.setItem('theme', next);
-        btn.textContent = next === 'dark' ? 'Switch to light mode' : 'Switch to dark mode';
-      });
-    })();
-  </script>
-      <p>Contact me via email: <a href="mailto:pillarisettikeshav@gmail.com">pillarisettikeshav@gmail.com</a></p>
-    </footer>
-  </div>
+  <button id="themeToggleFab" class="theme-fab" type="button" aria-label="Toggle color theme">🌙</button>
+  <script src="/script.js"></script>
 </body>
 </html>
