@@ -1,31 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Keshav's Portfolio</title>
-    <style>
-        body, h1, h2, h3, p, ul, li { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; color: #ccc; background: #121212; text-align: center; }
-        header, nav { background: #1a1a1e; color: #fff; padding: 20px 50px; }
-        nav { display: flex; justify-content: center; }
-        nav a { color: #ccc; text-decoration: none; padding: 10px 20px; background: #444; border-radius: 5px; font-weight: bold; margin: 0 5px; }
-        nav a:hover { background: #666; }
-        footer { background: #1a1a1a; color: #fff; padding: 20px 0; }
-        footer a { color: #ccc; text-decoration: none; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Keshav's Portfolio</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <div class="container">
     <header>
-        <h1>Welcome to Keshav's Portfolio</h1>
-        <p>Navigating creativity and technology.</p>
+      <h1>Keshav's Portfolio</h1>
+      <p class="subtitle">Building meaningful products at the intersection of creativity and technology.</p>
     </header>
+
     <nav>
-        <a href="about.html">About Me</a>
-        <a href="skills.html">Skills</a>
+      <a href="index.html" aria-current="page">Home</a>
+      <a href="about.html">About Me</a>
+      <a href="skills.html">Skills</a>
     </nav>
+
+    <main>
+      <section class="hero">
+        <h2>Hi, I'm Keshav 👋</h2>
+        <p>
+          I enjoy transforming ideas into practical, polished digital experiences. Explore my background,
+          capabilities, and projects to see the kind of work I love doing.
+        </p>
+        <div class="cta-row">
+          <a class="button primary" href="skills.html">View Skills & Projects</a>
+          <a class="button secondary" href="about.html">Learn About Me</a>
+        </div>
+      </section>
+
+      <section class="grid" aria-label="Highlights">
+        <article class="card">
+          <h3>User-Centered Design</h3>
+          <p>I focus on clarity, accessibility, and intuitive user journeys.</p>
+        </article>
+        <article class="card">
+          <h3>Full-Stack Thinking</h3>
+          <p>I bridge frontend polish with solid backend logic and data flow.</p>
+        </article>
+        <article class="card">
+          <h3>Continuous Learning</h3>
+          <p>I keep growing through hands-on experimentation and iteration.</p>
+        </article>
+      </section>
+    </main>
+
     <footer>
-        <p>Contact me via email: <a href="mailto:pillarisettikeshav@gmail.com">Mail me</a></p>
+      <p>Contact me via email: <a href="mailto:pillarisettikeshav@gmail.com">pillarisettikeshav@gmail.com</a></p>
     </footer>
+  </div>
 </body>
 </html>
