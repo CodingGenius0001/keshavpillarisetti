@@ -11,7 +11,7 @@
 
   function paintIcon(currentTheme) {
     const isDark = currentTheme === 'dark';
-    btn.textContent = isDark ? '☀️' : '🌙';
+    btn.textContent = isDark ? '\u2600\uFE0F' : '\uD83C\uDF19';
     btn.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
     btn.title = isDark ? 'Switch to light mode' : 'Switch to dark mode';
   }

@@ -3,54 +3,76 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Keshav Pillarisetti | Portfolio</title>
+  <title>Keshav Pillarisetti</title>
+  <meta name="description" content="Portfolio of Keshav Pillarisetti — building thoughtful, user-friendly digital experiences.">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <div class="container">
-    <header>
-      <h1>Keshav Pillarisetti</h1>
-      <p class="subtitle">Portfolio</p>
+    <header class="fade-in">
+      <a href="/" class="site-title">Keshav Pillarisetti</a>
+      <nav>
+        <a href="/" aria-current="page">Home</a>
+        <a href="/about/">About</a>
+        <a href="/skills/">Skills</a>
+      </nav>
     </header>
 
-    <nav>
-      <a href="/" aria-current="page">Home</a>
-      <a href="/about/">About</a>
-      <a href="/skills/">Skills</a>
-    </nav>
-
     <main>
-      <section class="hero">
+      <section class="hero fade-in">
         <div class="profile-wrap">
-          <img class="profile-photo" src="/assets/profile-placeholder.svg" alt="Profile picture of Keshav Pillarisetti">
-          <p class="full-name">Keshav Pillarisetti</p>
+          <img class="profile-photo" src="/src/1753799221341.jpg" alt="Profile picture of Keshav Pillarisetti" width="80" height="80">
+          <div class="profile-info">
+            <p class="full-name">Keshav Pillarisetti</p>
+            <p class="profile-role">Developer &amp; Builder</p>
+          </div>
         </div>
-        <h2>Hi, welcome!</h2>
-        <p>I build thoughtful, user-friendly digital experiences by combining creativity with practical engineering.</p>
+        <h1 class="hero-heading">Building thoughtful digital experiences.</h1>
+        <p class="hero-text">I combine creativity with practical engineering to create solutions that are simple, useful, and polished. Currently open to internships and collaborations.</p>
+        <div class="status-line">
+          <span class="status-dot"></span>
+          <span class="status-text">Available for opportunities</span>
+        </div>
       </section>
+
+      <p class="section-label fade-in">Explore</p>
 
       <section class="grid" aria-label="Highlights">
-        <article class="card">
-          <h3>About</h3>
-          <p>Learn more about my background, interests, and approach to building products.</p>
-        </article>
-        <article class="card">
-          <h3>Skills</h3>
-          <p>Explore my frontend, backend, and project delivery capabilities.</p>
-          <a class="resume-link" href="/src/Keshav%20Pillarisetti%20-%20Resume.pdf" download>
-            <span class="resume-icon" aria-hidden="true">⬇️</span>
-            <span>Download Resume</span>
-          </a>
-        </article>
-        <article class="card">
-          <h3>Contact</h3>
-          <p>Reach me directly for internships, collaborations, or project discussions.</p>
-        </article>
+        <a href="/about/" class="card-link fade-in">
+          <article class="card">
+            <h3>About</h3>
+            <p>My background, interests, and approach to building products.</p>
+            <span class="card-arrow">&rarr;</span>
+          </article>
+        </a>
+        <a href="/skills/" class="card-link fade-in">
+          <article class="card">
+            <h3>Skills</h3>
+            <p>Frontend, backend, and project delivery capabilities.</p>
+            <span class="card-arrow">&rarr;</span>
+          </article>
+        </a>
+        <a href="mailto:pkeshav.business@gmail.com" class="card-link fade-in">
+          <article class="card">
+            <h3>Contact</h3>
+            <p>Reach out for internships, collaborations, or discussions.</p>
+            <span class="card-arrow">&rarr;</span>
+          </article>
+        </a>
       </section>
+
+      <p class="section-label fade-in">Resume</p>
+
+      <div class="fade-in">
+        <a class="resume-link" href="/src/Keshav%20Pillarisetti%20-%20Resume.pdf" download>
+          <span class="resume-icon" aria-hidden="true">↓</span>
+          <span>Download Resume</span>
+        </a>
+      </div>
     </main>
 
-    <footer>
-      <p>Contact me via email: <a href="mailto:pkeshav.business@gmail.com">pkeshav.business@gmail.com</a></p>
+    <footer class="fade-in">
+      <p>&copy; 2026 Keshav Pillarisetti &middot; <a href="mailto:pkeshav.business@gmail.com">pkeshav.business@gmail.com</a></p>
     </footer>
   </div>
 
