@@ -3,58 +3,77 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Keshav Pillarisetti | Skills</title>
+  <title>Skills — Keshav Pillarisetti</title>
+  <meta name="description" content="Explore Keshav Pillarisetti's technical skills — frontend, backend, and project delivery.">
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
   <div class="container">
-    <header>
-      <h1>Keshav Pillarisetti</h1>
-      <p class="subtitle">Portfolio</p>
+    <header class="fade-in">
+      <a href="/" class="site-title">Keshav Pillarisetti</a>
+      <nav>
+        <a href="/">Home</a>
+        <a href="/about/">About</a>
+        <a href="/skills/" aria-current="page">Skills</a>
+      </nav>
     </header>
 
-    <nav>
-      <a href="/">Home</a>
-      <a href="/about/">About</a>
-      <a href="/skills/" aria-current="page">Skills</a>
-    </nav>
-
     <main>
-      <section class="hero">
-        <h2>Skills</h2>
-        <p>I work across design, development, and delivery with a strong focus on usability and reliability.</p>
+      <section class="hero fade-in">
+        <h1 class="hero-heading">Skills</h1>
+        <p class="hero-text">I work across design, development, and delivery — with a strong focus on usability and reliability.</p>
       </section>
 
-      <section class="grid">
-        <article class="card">
+      <p class="section-label fade-in">Technical</p>
+
+      <section class="grid" aria-label="Technical skills">
+        <article class="card fade-in">
           <h3>Frontend</h3>
-          <ul>
-            <li>Responsive HTML/CSS interfaces</li>
-            <li>Clean and accessible layouts</li>
-            <li>Performance-aware UI decisions</li>
-          </ul>
+          <p>Building responsive, accessible, and performance-aware interfaces.</p>
+          <div class="skill-tag-group">
+            <span class="skill-tag">HTML / CSS</span>
+            <span class="skill-tag">Responsive Design</span>
+            <span class="skill-tag">Accessibility</span>
+            <span class="skill-tag">UI / UX</span>
+          </div>
         </article>
-        <article class="card">
-          <h3>Backend & Logic</h3>
-          <ul>
-            <li>API integration and data handling</li>
-            <li>Debugging and testing workflows</li>
-            <li>Reliable feature implementation</li>
-          </ul>
+        <article class="card fade-in">
+          <h3>Backend &amp; Logic</h3>
+          <p>Handling data, integrating APIs, and shipping reliable features.</p>
+          <div class="skill-tag-group">
+            <span class="skill-tag">API Integration</span>
+            <span class="skill-tag">Data Handling</span>
+            <span class="skill-tag">Testing</span>
+            <span class="skill-tag">Debugging</span>
+          </div>
         </article>
-        <article class="card">
+      </section>
+
+      <p class="section-label fade-in">Delivery</p>
+
+      <section class="grid" aria-label="Delivery skills">
+        <article class="card fade-in">
+          <h3>Process</h3>
+          <p>Iterative development with a focus on collaboration and quality.</p>
+          <div class="skill-tag-group">
+            <span class="skill-tag">Agile Workflow</span>
+            <span class="skill-tag">Version Control</span>
+            <span class="skill-tag">Code Review</span>
+          </div>
+        </article>
+        <article class="card fade-in">
           <h3>Resume</h3>
-          <p>Download my latest resume here.</p>
+          <p>Download my latest resume for a complete overview.</p>
           <a class="resume-link" href="/src/Keshav%20Pillarisetti%20-%20Resume.pdf" download>
-            <span class="resume-icon" aria-hidden="true">⬇️</span>
+            <span class="resume-icon" aria-hidden="true">↓</span>
             <span>Download Resume</span>
           </a>
         </article>
       </section>
     </main>
 
-    <footer>
-      <p>Contact me via email: <a href="mailto:pkeshav.business@gmail.com">pkeshav.business@gmail.com</a></p>
+    <footer class="fade-in">
+      <p>&copy; 2026 Keshav Pillarisetti &middot; <a href="mailto:pkeshav.business@gmail.com">pkeshav.business@gmail.com</a></p>
     </footer>
   </div>
 
