@@ -255,8 +255,8 @@ body.modal-open {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 136%;
-  height: 136%;
+  width: 164%;
+  height: 164%;
   transform: translate(-50%, -50%);
   image-rendering: pixelated;
   image-rendering: crisp-edges;

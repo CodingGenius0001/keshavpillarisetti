@@ -315,7 +315,7 @@
     const isCoarse = window.matchMedia('(pointer: coarse)').matches || window.innerWidth <= 768;
     const width = ico.clientWidth || 140;
     const height = ico.clientHeight || 140;
-    const overscan = isCoarse ? 1.18 : 1.28;
+    const overscan = isCoarse ? 1.34 : 1.56;
     const drawWidth = Math.round(width * overscan);
     const drawHeight = Math.round(height * overscan);
 
