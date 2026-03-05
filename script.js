@@ -374,14 +374,13 @@
     let yaw = Math.PI / 4;
     let lastTick = performance.now();
     const spinSpeed = isCoarse ? 0.0028 : 0.0036;
-    const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
-    const dragScale = isCoarse ? 0.0068 : 0.0054;
-    const maxOffsetX = isCoarse ? 0.86 : 0.98;
-    const maxOffsetY = isCoarse ? 0.62 : 0.72;
-    let targetOffsetX = 0;
-    let targetOffsetY = 0;
-    let smoothOffsetX = 0;
-    let smoothOffsetY = 0;
+    const dragYawScale = isCoarse ? 0.0135 : 0.0115;
+    const dragPitchScale = isCoarse ? 0.0105 : 0.0088;
+    const clampPitch = (n) => Math.max(-1.45, Math.min(1.45, n));
+    let targetYawOffset = 0;
+    let targetPitchOffset = 0;
+    let smoothYawOffset = 0;
+    let smoothPitchOffset = 0;
     let dragPointerId = null;
     let dragLastX = 0;
     let dragLastY = 0;
@@ -412,8 +411,8 @@
       const dy = e.clientY - dragLastY;
       dragLastX = e.clientX;
       dragLastY = e.clientY;
-      targetOffsetX = clamp(targetOffsetX + (dx * dragScale), -maxOffsetX, maxOffsetX);
-      targetOffsetY = clamp(targetOffsetY - (dy * dragScale), -maxOffsetY, maxOffsetY);
+      targetYawOffset += dx * dragYawScale;
+      targetPitchOffset = clampPitch(targetPitchOffset + (dy * dragPitchScale));
     }
 
     function endDrag(e) {
@@ -430,6 +429,7 @@
 
     ico.addEventListener('pointerdown', beginDrag);
     ico.addEventListener('pointermove', updateDrag);
+    window.addEventListener('pointermove', updateDrag, { passive: true });
     ico.addEventListener('pointerup', endDrag);
     ico.addEventListener('pointercancel', endDrag);
     ico.addEventListener('lostpointercapture', (e) => {
@@ -446,11 +446,11 @@
 
     function render() {
       if (mesh) {
-        const follow = dragPointerId === null ? 0.14 : 0.34;
-        smoothOffsetX += (targetOffsetX - smoothOffsetX) * follow;
-        smoothOffsetY += (targetOffsetY - smoothOffsetY) * follow;
-        mesh.rotation.set(0, yaw, 0);
-        mesh.position.set(smoothOffsetX, smoothOffsetY, 0);
+        const follow = dragPointerId === null ? 0.1 : 0.35;
+        smoothYawOffset += (targetYawOffset - smoothYawOffset) * follow;
+        smoothPitchOffset += (targetPitchOffset - smoothPitchOffset) * follow;
+        mesh.rotation.set(smoothPitchOffset, yaw + smoothYawOffset, 0);
+        mesh.position.set(0, 0, 0);
         mesh.scale.setScalar(1);
       }
       renderer.render(scene, camera);
