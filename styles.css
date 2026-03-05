@@ -247,8 +247,8 @@ body.modal-open {
   place-items: center;
   overflow: visible;
   cursor: var(--cursor-pickaxe), auto;
-  margin-top: 0;
-  margin-bottom: 0.22rem;
+  margin-top: -0.62rem;
+  margin-bottom: 1.18rem;
 }
 
 .hero-icosa canvas {
@@ -917,7 +917,8 @@ footer a:hover {
   .hero-icosa {
     width: clamp(116px, 24vw, 166px);
     height: clamp(116px, 24vw, 166px);
-    margin-bottom: 0.2rem;
+    margin-top: -0.5rem;
+    margin-bottom: 0.9rem;
   }
 
   .hero-line {
@@ -1021,7 +1022,8 @@ footer a:hover {
   .hero-icosa {
     width: clamp(102px, 32vw, 136px);
     height: clamp(102px, 32vw, 136px);
-    margin-bottom: 0.16rem;
+    margin-top: -0.34rem;
+    margin-bottom: 0.62rem;
   }
 
   .hero-line {
