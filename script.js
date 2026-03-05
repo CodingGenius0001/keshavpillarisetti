@@ -321,7 +321,7 @@
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(34, drawWidth / drawHeight, 0.1, 100);
-    camera.position.set(1.35, 1.7, 3.6);
+    camera.position.set(2.05, 1.9, 2.45);
     camera.lookAt(0, 0, 0);
 
     const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
@@ -366,12 +366,14 @@
         ];
         const cube = new THREE.Mesh(new THREE.BoxGeometry(1.7, 1.7, 1.7), mats);
         setCube(cube);
+        requestAnimationFrame(animate);
       })
       .catch(failVisual);
 
     let mesh = null;
-    const baseYaw = Math.PI / 4;
-    const basePitch = -0.68;
+    let yaw = Math.PI / 4;
+    let lastTick = performance.now();
+    const spinSpeed = isCoarse ? 0.0028 : 0.0036;
 
     function setCube(cube) {
       scene.add(cube);
@@ -379,9 +381,17 @@
       render();
     }
 
+    function animate(now) {
+      const dt = Math.max(0.55, Math.min(2.1, (now - lastTick) / 16.67));
+      lastTick = now;
+      yaw += spinSpeed * dt;
+      render();
+      requestAnimationFrame(animate);
+    }
+
     function render() {
       if (mesh) {
-        mesh.rotation.set(basePitch, baseYaw, 0);
+        mesh.rotation.set(0, yaw, 0);
         mesh.scale.setScalar(1);
       }
       renderer.render(scene, camera);
