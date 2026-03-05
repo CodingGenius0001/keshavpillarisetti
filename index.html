@@ -15,8 +15,18 @@
 
   <div class="page-shell">
     <header class="topbar">
-      <a class="top-name" href="/">Keshav Pillarisetti</a>
-      <nav class="nav-links">
+      <a class="top-name" href="/" aria-label="Keshav Pillarisetti home">KP</a>
+      <button
+        class="nav-menu-toggle"
+        id="navMenuToggle"
+        type="button"
+        aria-label="toggle navigation menu"
+        aria-controls="topNavLinks"
+        aria-expanded="false"
+      >
+        menu
+      </button>
+      <nav class="nav-links" id="topNavLinks">
         <a href="/" aria-current="page">home</a>
         <a href="/about/">about</a>
         <a href="/skills/">skills</a>
