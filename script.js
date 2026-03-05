@@ -90,6 +90,17 @@
   const orbs = [];
   const leaves = [];
   const pointer = { x: null, y: null };
+  const hasFinePointer = window.matchMedia('(pointer: fine)').matches;
+  const getMotionProfile = () => {
+    const mobile = window.innerWidth <= 768;
+    return {
+      orbCount: mobile ? 18 : 25,
+      leafMax: mobile ? 12 : 24,
+      leafSpawnChance: mobile ? 0.0045 : 0.008,
+      orbDrift: mobile ? 0.72 : 0.9
+    };
+  };
+  let motion = getMotionProfile();
   const ORB_BASE_FRAMES_8 = [
     ['00011000', '00132200', '01322310', '12222321', '12222321', '01322310', '00132200', '00011000'],
     ['00011000', '00133300', '01322310', '12222321', '12222321', '01322210', '00132200', '00011000'],
@@ -115,14 +126,14 @@
 
   function seedOrbs() {
     orbs.length = 0;
-    const count = 25;
+    const count = motion.orbCount;
     for (let i = 0; i < count; i++) {
       orbs.push({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
         size: 14 + Math.random() * 9,
-        dx: (Math.random() - 0.5) * 0.9,
-        dy: (Math.random() - 0.5) * 0.9,
+        dx: (Math.random() - 0.5) * motion.orbDrift,
+        dy: (Math.random() - 0.5) * motion.orbDrift,
         alpha: 0.65 + Math.random() * 0.25,
         phase: Math.random() * Math.PI * 2,
         wobble: 0.8 + Math.random() * 0.9,
@@ -179,7 +190,7 @@
     ctx.imageSmoothingEnabled = false;
     const t = (time || 0) / 1000;
 
-    if (leaves.length < 24 && Math.random() < 0.008) {
+    if (leaves.length < motion.leafMax && Math.random() < motion.leafSpawnChance) {
       spawnLeaf();
     }
 
@@ -248,11 +259,13 @@
   draw();
   window.addEventListener('resize', () => {
     resize();
+    motion = getMotionProfile();
     seedOrbs();
     leaves.length = 0;
   });
 
   window.addEventListener('pointermove', (e) => {
+    if (!hasFinePointer) return;
     pointer.x = e.clientX;
     pointer.y = e.clientY;
   });
@@ -296,19 +309,22 @@
   );
 
   function initScene() {
+    const isCoarsePointer = window.matchMedia('(pointer: coarse)').matches || window.innerWidth <= 768;
+    const allowPointerDrive = !isCoarsePointer;
+    const idleSpin = isCoarsePointer ? 0.0056 : 0.007;
     const width = ico.clientWidth || 140;
     const height = ico.clientHeight || 140;
-    const canvasOverscan = 1.36;
+    const canvasOverscan = isCoarsePointer ? 1.22 : 1.36;
     const drawWidth = Math.round(width * canvasOverscan);
     const drawHeight = Math.round(height * canvasOverscan);
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(34, drawWidth / drawHeight, 0.1, 1000);
-    camera.position.set(0, 14, 96);
+    camera.position.set(0, isCoarsePointer ? 13 : 14, isCoarsePointer ? 102 : 96);
     camera.lookAt(0, 0, 0);
 
     const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
     renderer.setSize(drawWidth, drawHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, isCoarsePointer ? 1.35 : 2));
     renderer.setClearColor(0x000000, 0);
     renderer.toneMapping = THREE.NoToneMapping;
     ico.appendChild(renderer.domElement);
@@ -457,7 +473,7 @@
       const size = new THREE.Vector3();
       geometry.boundingBox.getSize(size);
       const maxDim = Math.max(size.x, size.y, size.z) || 1;
-      const targetSize = 31;
+      const targetSize = isCoarsePointer ? 27 : 31;
       const scale = targetSize / maxDim;
 
       const topMat = new THREE.MeshLambertMaterial({ map: textures.top, color: 0xffffff });
@@ -570,7 +586,7 @@
     let tiltX = 0.11;
     let rotY = 0;
     let velX = 0;
-    let velY = 0.007;
+    let velY = idleSpin;
     let pointerYaw = 0;
     let pointerPitch = 0;
     let pointerInside = false;
@@ -583,7 +599,7 @@
       pointerYaw *= 0.9;
       pointerPitch *= 0.9;
 
-      const targetVelY = pointerDriving ? pointerYaw : 0.007;
+      const targetVelY = pointerDriving ? pointerYaw : idleSpin;
       const targetVelX = pointerDriving ? pointerPitch : 0;
       velY += (targetVelY - velY) * (pointerDriving ? 0.42 : 0.06);
       velX += (targetVelX - velX) * (pointerDriving ? 0.37 : 0.1);
@@ -618,23 +634,35 @@
     }
     window.addEventListener('resize', resize);
 
-    ico.addEventListener('pointerenter', () => {
-      pointerInside = true;
-      baseScale = 1.06;
-    });
-    ico.addEventListener('pointermove', (e) => {
-      lastMoveAt = performance.now();
-      const dx = Math.max(-16, Math.min(16, e.movementX || 0));
-      const dy = Math.max(-16, Math.min(16, e.movementY || 0));
-      pointerYaw = Math.max(-0.072, Math.min(0.072, dx * 0.00345));
-      pointerPitch = Math.max(-0.045, Math.min(0.045, dy * 0.0027));
-    });
-    ico.addEventListener('pointerleave', () => {
-      pointerInside = false;
-      baseScale = 1;
-      pointerYaw *= 0.45;
-      pointerPitch *= 0.45;
-    });
+    if (allowPointerDrive) {
+      ico.addEventListener('pointerenter', () => {
+        pointerInside = true;
+        baseScale = 1.06;
+      });
+      ico.addEventListener('pointermove', (e) => {
+        lastMoveAt = performance.now();
+        const dx = Math.max(-16, Math.min(16, e.movementX || 0));
+        const dy = Math.max(-16, Math.min(16, e.movementY || 0));
+        pointerYaw = Math.max(-0.072, Math.min(0.072, dx * 0.00345));
+        pointerPitch = Math.max(-0.045, Math.min(0.045, dy * 0.0027));
+      });
+      ico.addEventListener('pointerleave', () => {
+        pointerInside = false;
+        baseScale = 1;
+        pointerYaw *= 0.45;
+        pointerPitch *= 0.45;
+      });
+    } else {
+      ico.addEventListener('pointerdown', () => {
+        baseScale = 1.03;
+      });
+      ico.addEventListener('pointerup', () => {
+        baseScale = 1;
+      });
+      ico.addEventListener('pointercancel', () => {
+        baseScale = 1;
+      });
+    }
     ico.addEventListener('click', () => {
       pulseEnergy = 1;
       ico.classList.remove('rippling');
