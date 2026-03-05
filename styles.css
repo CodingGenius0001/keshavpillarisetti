@@ -175,10 +175,10 @@ body.modal-open {
   width: min(1100px, 92%);
   margin: 0 auto;
   padding: 2rem 0 3rem;
-  min-height: 100vh;
+  min-height: 100svh;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
 }
 
 .topbar {
@@ -227,11 +227,14 @@ body.modal-open {
 }
 
 .hero-full {
-  padding: clamp(3rem, 8vw, 6rem) 0;
+  flex: 1 1 auto;
+  min-height: clamp(420px, calc(100svh - 170px), 760px);
+  padding: clamp(1.1rem, 4vh, 2.5rem) 0;
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 0.6rem;
 }
 
@@ -245,8 +248,8 @@ body.modal-open {
   cursor: var(--cursor-pickaxe-active), pointer;
   transition: transform 0.35s ease, filter 0.35s ease;
   filter: drop-shadow(0 16px 18px rgba(0, 0, 0, 0.35));
-  margin-top: -2.35rem;
-  margin-bottom: 2.45rem;
+  margin-top: 0;
+  margin-bottom: 1.35rem;
 }
 
 .hero-icosa canvas {
@@ -923,6 +926,7 @@ footer a:hover {
   .home .page-shell {
     width: 94%;
     padding-top: 1.25rem;
+    min-height: 100svh;
   }
 
   .topbar {
@@ -938,7 +942,8 @@ footer a:hover {
   }
 
   .hero-full {
-    padding: 2.5rem 0;
+    min-height: calc(100svh - 150px);
+    padding: 1.7rem 0;
   }
 
   .type-line {
