@@ -47,8 +47,7 @@
     'learner',
     'youtuber',
     'tech enthusiast',
-    'builder',
-    'tinkerer'
+    'builder'
   ];
 
   let wordIndex = 0;
