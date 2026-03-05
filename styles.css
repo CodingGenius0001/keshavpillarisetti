@@ -246,67 +246,25 @@ body.modal-open {
   display: grid;
   place-items: center;
   overflow: visible;
-  perspective: 980px;
-  perspective-origin: 50% 44%;
   cursor: var(--cursor-pickaxe-active), pointer;
   margin-top: 0;
   margin-bottom: 1.35rem;
 }
 
-.hero-crafting-cube {
-  position: relative;
-  width: var(--cube-size, 108px);
-  height: var(--cube-size, 108px);
-  transform-style: preserve-3d;
-  will-change: transform, filter;
+.hero-icosa canvas {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 136%;
+  height: 136%;
+  transform: translate(-50%, -50%);
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
   filter: drop-shadow(0 16px 18px rgba(0, 0, 0, 0.35));
   pointer-events: none;
 }
 
-.cube-face {
-  position: absolute;
-  inset: 0;
-  background-size: 100% 100%;
-  background-repeat: no-repeat;
-  image-rendering: pixelated;
-  image-rendering: crisp-edges;
-  backface-visibility: hidden;
-}
-
-.cube-front {
-  background-image: url("/src/crafting_table_front.png");
-  transform: translateZ(var(--cube-depth, 54px));
-}
-
-.cube-back {
-  background-image: url("/src/crafting_table_side.png");
-  transform: rotateY(180deg) translateZ(var(--cube-depth, 54px));
-  filter: brightness(0.84);
-}
-
-.cube-right {
-  background-image: url("/src/crafting_table_side.png");
-  transform: rotateY(90deg) translateZ(var(--cube-depth, 54px));
-}
-
-.cube-left {
-  background-image: url("/src/crafting_table_front.png");
-  transform: rotateY(-90deg) translateZ(var(--cube-depth, 54px));
-  filter: brightness(0.9);
-}
-
-.cube-top {
-  background-image: url("/src/crafting_table_top.png");
-  transform: rotateX(90deg) translateZ(var(--cube-depth, 54px));
-}
-
-.cube-bottom {
-  background-image: url("/src/crafting_table_side.png");
-  transform: rotateX(-90deg) translateZ(var(--cube-depth, 54px));
-  filter: brightness(0.72);
-}
-
-.hero-icosa:hover .hero-crafting-cube {
+.hero-icosa:hover canvas {
   filter: drop-shadow(0 20px 24px rgba(0, 0, 0, 0.42));
 }
 
@@ -881,7 +839,7 @@ footer a:hover {
 }
 
 @media (hover: none) {
-  .hero-icosa:hover .hero-crafting-cube {
+  .hero-icosa:hover canvas {
     filter: drop-shadow(0 16px 18px rgba(0, 0, 0, 0.35));
   }
 

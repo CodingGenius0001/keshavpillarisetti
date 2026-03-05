@@ -279,117 +279,200 @@
   const ico = document.getElementById('heroIcosa');
   if (!ico) return;
 
-  ico.textContent = '';
-  const cube = document.createElement('div');
-  cube.className = 'hero-crafting-cube';
-  cube.setAttribute('aria-hidden', 'true');
-  ico.appendChild(cube);
-
-  ['front', 'back', 'right', 'left', 'top', 'bottom'].forEach((name) => {
-    const face = document.createElement('div');
-    face.className = `cube-face cube-${name}`;
-    cube.appendChild(face);
-  });
-
-  let pointerInside = false;
-  let pointerYaw = 0;
-  let pointerPitch = 0;
-  let targetScale = 1;
-  let baseYaw = 32;
-  const basePitch = -18;
-
-  let smoothYaw = baseYaw;
-  let smoothPitch = basePitch;
-  let smoothScale = 1;
-  let pulseEnergy = 0;
-  let lastTick = performance.now();
-
-  const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
-
-  function updateCubeSizing() {
-    const size = Math.min(ico.clientWidth || 140, ico.clientHeight || 140) * 0.76;
-    cube.style.setProperty('--cube-size', `${size.toFixed(2)}px`);
-    cube.style.setProperty('--cube-depth', `${(size * 0.5).toFixed(2)}px`);
-  }
-
-  updateCubeSizing();
-  window.addEventListener('resize', updateCubeSizing);
-
-  function updatePointerTarget(clientX, clientY) {
-    const rect = ico.getBoundingClientRect();
-    const nx = ((clientX - rect.left) / rect.width - 0.5) * 2;
-    const ny = ((clientY - rect.top) / rect.height - 0.5) * 2;
-    const x = clamp(nx, -1, 1);
-    const y = clamp(ny, -1, 1);
-    pointerYaw = x * 58;
-    pointerPitch = -y * 34;
-  }
-
-  ico.addEventListener('pointerenter', (e) => {
-    pointerInside = true;
-    targetScale = 1.08;
-    updatePointerTarget(e.clientX, e.clientY);
-  });
-
-  ico.addEventListener('pointermove', (e) => {
-    if (!pointerInside) return;
-    updatePointerTarget(e.clientX, e.clientY);
-  });
-
-  ico.addEventListener('pointerleave', () => {
-    pointerInside = false;
-    pointerYaw = 0;
-    pointerPitch = 0;
-    targetScale = 1;
-  });
-
-  ico.addEventListener('pointerdown', (e) => {
-    targetScale = 1.05;
-    updatePointerTarget(e.clientX, e.clientY);
-  });
-
-  const onPointerRelease = () => {
-    targetScale = pointerInside ? 1.08 : 1;
+  const THREE_URL = 'https://unpkg.com/three@0.160.0/build/three.min.js';
+  const TEX = {
+    top: '/src/crafting_table_top.png',
+    side: '/src/crafting_table_side.png',
+    front: '/src/crafting_table_front.png'
   };
-  ico.addEventListener('pointerup', onPointerRelease);
-  ico.addEventListener('pointercancel', onPointerRelease);
 
-  ico.addEventListener('click', () => {
-    pulseEnergy = 1;
-    ico.classList.remove('rippling');
-    ico.classList.remove('pulse');
-    void ico.offsetWidth;
-    ico.classList.add('rippling');
-    ico.classList.add('pulse');
-  });
+  const loadScript = (src, readyCheck, onReady, onError) => {
+    if (readyCheck()) return onReady();
+    const s = document.createElement('script');
+    s.src = src;
+    s.async = true;
+    s.crossOrigin = 'anonymous';
+    s.onload = onReady;
+    s.onerror = onError;
+    document.head.appendChild(s);
+  };
 
-  function animate(now) {
-    const dt = Math.max(10, Math.min(34, now - lastTick || 16));
-    lastTick = now;
+  const failVisual = () => {
+    ico.style.backgroundImage = `url("${TEX.front}")`;
+    ico.style.backgroundSize = 'contain';
+    ico.style.backgroundPosition = 'center';
+    ico.style.backgroundRepeat = 'no-repeat';
+  };
 
-    if (!pointerInside) {
-      baseYaw += dt * 0.04;
+  loadScript(
+    THREE_URL,
+    () => !!window.THREE,
+    initScene,
+    failVisual
+  );
+
+  function initScene() {
+    const isCoarse = window.matchMedia('(pointer: coarse)').matches || window.innerWidth <= 768;
+    const width = ico.clientWidth || 140;
+    const height = ico.clientHeight || 140;
+    const overscan = isCoarse ? 1.18 : 1.28;
+    const drawWidth = Math.round(width * overscan);
+    const drawHeight = Math.round(height * overscan);
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(34, drawWidth / drawHeight, 0.1, 100);
+    camera.position.set(0, 0.2, 4.4);
+    camera.lookAt(0, 0, 0);
+
+    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    renderer.setClearColor(0x000000, 0);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, isCoarse ? 1.4 : 2));
+    renderer.setSize(drawWidth, drawHeight);
+    renderer.domElement.setAttribute('aria-hidden', 'true');
+    ico.textContent = '';
+    ico.appendChild(renderer.domElement);
+
+    const ambient = new THREE.AmbientLight(0xffffff, 0.74);
+    const key = new THREE.DirectionalLight(0xffffff, 0.8);
+    key.position.set(2, 3, 3);
+    const fill = new THREE.DirectionalLight(0xffffff, 0.34);
+    fill.position.set(-2, 1.2, -1.2);
+    scene.add(ambient, key, fill);
+
+    const loader = new THREE.TextureLoader();
+    const configureTexture = (tex) => {
+      tex.magFilter = THREE.NearestFilter;
+      tex.minFilter = THREE.NearestFilter;
+      tex.generateMipmaps = false;
+      tex.colorSpace = THREE.SRGBColorSpace;
+      tex.wrapS = THREE.ClampToEdgeWrapping;
+      tex.wrapT = THREE.ClampToEdgeWrapping;
+      tex.needsUpdate = true;
+      return tex;
+    };
+    const loadTexture = (url) => new Promise((resolve, reject) => {
+      loader.load(url, (tex) => resolve(configureTexture(tex)), undefined, () => reject(new Error(url)));
+    });
+
+    Promise.all([loadTexture(TEX.top), loadTexture(TEX.side), loadTexture(TEX.front)])
+      .then(([top, side, front]) => {
+        const mats = [
+          new THREE.MeshLambertMaterial({ map: side, color: 0xf2f2f2 }), // right
+          new THREE.MeshLambertMaterial({ map: side, color: 0xe8e8e8 }), // left
+          new THREE.MeshLambertMaterial({ map: top, color: 0xffffff }), // top
+          new THREE.MeshLambertMaterial({ map: side, color: 0x8d7a61 }), // bottom
+          new THREE.MeshLambertMaterial({ map: front, color: 0xffffff }), // front
+          new THREE.MeshLambertMaterial({ map: front, color: 0xe6e6e6 }) // back
+        ];
+        const cube = new THREE.Mesh(new THREE.BoxGeometry(1.7, 1.7, 1.7), mats);
+        scene.add(cube);
+        attachInteraction(cube);
+      })
+      .catch(failVisual);
+
+    let pointerInside = false;
+    let pointerYaw = 0;
+    let pointerPitch = 0;
+    let baseYaw = 0.62;
+    const basePitch = -0.34;
+    let smoothYaw = baseYaw;
+    let smoothPitch = basePitch;
+    let scaleBase = 1;
+    let smoothScale = 1;
+    let pulseEnergy = 0;
+    let mesh = null;
+
+    const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
+
+    function attachInteraction(cube) {
+      mesh = cube;
     }
 
-    if (pulseEnergy > 0) {
-      pulseEnergy *= 0.9;
-      if (pulseEnergy < 0.01) pulseEnergy = 0;
+    function setPointer(clientX, clientY) {
+      const rect = ico.getBoundingClientRect();
+      const nx = ((clientX - rect.left) / rect.width - 0.5) * 2;
+      const ny = ((clientY - rect.top) / rect.height - 0.5) * 2;
+      const x = clamp(nx, -1, 1);
+      const y = clamp(ny, -1, 1);
+      pointerYaw = x * 0.95;
+      pointerPitch = -y * 0.55;
     }
 
-    const desiredYaw = baseYaw + pointerYaw;
-    const desiredPitch = basePitch + pointerPitch;
+    ico.addEventListener('pointerenter', (e) => {
+      pointerInside = true;
+      scaleBase = 1.08;
+      setPointer(e.clientX, e.clientY);
+    });
 
-    smoothYaw += (desiredYaw - smoothYaw) * (pointerInside ? 0.36 : 0.11);
-    smoothPitch += (desiredPitch - smoothPitch) * (pointerInside ? 0.3 : 0.1);
+    ico.addEventListener('pointermove', (e) => {
+      if (!pointerInside) return;
+      setPointer(e.clientX, e.clientY);
+    });
 
-    const pulseScale = 1 + (pulseEnergy * 0.07);
-    smoothScale += (((targetScale * pulseScale) - smoothScale) * 0.24);
+    ico.addEventListener('pointerleave', () => {
+      pointerInside = false;
+      pointerYaw = 0;
+      pointerPitch = 0;
+      scaleBase = 1;
+    });
 
-    cube.style.transform = `rotateX(${smoothPitch.toFixed(2)}deg) rotateY(${smoothYaw.toFixed(2)}deg) scale(${smoothScale.toFixed(3)})`;
+    ico.addEventListener('pointerdown', (e) => {
+      scaleBase = 1.04;
+      setPointer(e.clientX, e.clientY);
+    });
+
+    const onPointerRelease = () => {
+      scaleBase = pointerInside ? 1.08 : 1;
+    };
+    ico.addEventListener('pointerup', onPointerRelease);
+    ico.addEventListener('pointercancel', onPointerRelease);
+
+    ico.addEventListener('click', () => {
+      pulseEnergy = 1;
+      ico.classList.remove('rippling');
+      ico.classList.remove('pulse');
+      void ico.offsetWidth;
+      ico.classList.add('rippling');
+      ico.classList.add('pulse');
+    });
+
+    function animate() {
+      if (!pointerInside) baseYaw += isCoarse ? 0.0044 : 0.0061;
+
+      if (pulseEnergy > 0) {
+        pulseEnergy *= 0.9;
+        if (pulseEnergy < 0.01) pulseEnergy = 0;
+      }
+
+      const desiredYaw = baseYaw + pointerYaw;
+      const desiredPitch = basePitch + pointerPitch;
+      smoothYaw += (desiredYaw - smoothYaw) * (pointerInside ? 0.36 : 0.1);
+      smoothPitch += (desiredPitch - smoothPitch) * (pointerInside ? 0.3 : 0.1);
+
+      const pulseScale = 1 + (pulseEnergy * 0.07);
+      smoothScale += (((scaleBase * pulseScale) - smoothScale) * 0.24);
+
+      if (mesh) {
+        mesh.rotation.set(smoothPitch, smoothYaw, 0);
+        mesh.scale.setScalar(smoothScale);
+      }
+
+      renderer.render(scene, camera);
+      requestAnimationFrame(animate);
+    }
     requestAnimationFrame(animate);
-  }
 
-  requestAnimationFrame(animate);
+    function onResize() {
+      const w = ico.clientWidth || width;
+      const h = ico.clientHeight || height;
+      const dw = Math.round(w * overscan);
+      const dh = Math.round(h * overscan);
+      camera.aspect = dw / dh;
+      camera.updateProjectionMatrix();
+      renderer.setSize(dw, dh);
+    }
+    window.addEventListener('resize', onResize);
+  }
 })();
 
 (function calModal() {
