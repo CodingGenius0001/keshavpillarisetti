@@ -315,13 +315,13 @@
     const isCoarse = window.matchMedia('(pointer: coarse)').matches || window.innerWidth <= 768;
     const width = ico.clientWidth || 140;
     const height = ico.clientHeight || 140;
-    const overscan = isCoarse ? 1.34 : 1.56;
+    const overscan = isCoarse ? 1.5 : 1.78;
     const drawWidth = Math.round(width * overscan);
     const drawHeight = Math.round(height * overscan);
 
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(34, drawWidth / drawHeight, 0.1, 100);
-    camera.position.set(2.05, 1.9, 2.45);
+    const camera = new THREE.PerspectiveCamera(40, drawWidth / drawHeight, 0.1, 100);
+    camera.position.set(2.3, 2.15, 3.05);
     camera.lookAt(0, 0, 0);
 
     const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
@@ -364,7 +364,7 @@
           new THREE.MeshLambertMaterial({ map: front, color: 0xffffff }), // front
           new THREE.MeshLambertMaterial({ map: front, color: 0xe6e6e6 }) // back
         ];
-        const cube = new THREE.Mesh(new THREE.BoxGeometry(1.7, 1.7, 1.7), mats);
+        const cube = new THREE.Mesh(new THREE.BoxGeometry(1.34, 1.34, 1.34), mats);
         setCube(cube);
         requestAnimationFrame(animate);
       })
