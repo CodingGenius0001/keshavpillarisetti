@@ -275,402 +275,113 @@
   });
 })();
 
-(function heroIcosa() {
+(function heroCraftingSprite() {
   const ico = document.getElementById('heroIcosa');
   if (!ico) return;
-  const CRAFTING_MODEL_URL = '/src/craftingtableminecraft3d.stl';
-  const CRAFTING_COLOR_TEXTURES = {
-    top: '/src/crafting_table_top.png',
-    side: '/src/crafting_table_side.png',
-    front: '/src/crafting_table_front.png'
-  };
-  const THREE_URL = 'https://unpkg.com/three@0.160.0/build/three.min.js';
 
-  const failVisual = () => {
-    ico.style.background = 'rgba(0, 0, 0, 0.12)';
-    ico.style.border = '1px solid rgba(255, 255, 255, 0.2)';
-  };
+  ico.textContent = '';
+  const sprite = document.createElement('img');
+  sprite.className = 'hero-crafting-sprite';
+  sprite.src = '/src/crafting_table_front.png';
+  sprite.alt = '';
+  sprite.draggable = false;
+  sprite.setAttribute('aria-hidden', 'true');
+  ico.appendChild(sprite);
 
-  const loadScript = (src, readyCheck, onReady, onError) => {
-    if (readyCheck()) return onReady();
-    const s = document.createElement('script');
-    s.src = src;
-    s.onload = onReady;
-    s.onerror = onError;
-    document.head.appendChild(s);
-  };
+  let pointerInside = false;
+  let targetX = 0;
+  let targetY = 0;
+  let targetRot = 0;
+  let targetScale = 1;
 
-  loadScript(
-    THREE_URL,
-    () => !!window.THREE,
-    initScene,
-    failVisual
-  );
+  let smoothX = 0;
+  let smoothY = 0;
+  let smoothRot = 0;
+  let smoothScale = 1;
 
-  function initScene() {
-    const isCoarsePointer = window.matchMedia('(pointer: coarse)').matches || window.innerWidth <= 768;
-    const allowPointerDrive = !isCoarsePointer;
-    const idleSpin = isCoarsePointer ? 0.0056 : 0.007;
-    const width = ico.clientWidth || 140;
-    const height = ico.clientHeight || 140;
-    const canvasOverscan = isCoarsePointer ? 1.22 : 1.36;
-    const drawWidth = Math.round(width * canvasOverscan);
-    const drawHeight = Math.round(height * canvasOverscan);
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(34, drawWidth / drawHeight, 0.1, 1000);
-    camera.position.set(0, isCoarsePointer ? 13 : 14, isCoarsePointer ? 102 : 96);
-    camera.lookAt(0, 0, 0);
+  let pulseEnergy = 0;
+  let idlePhase = Math.random() * Math.PI * 2;
 
-    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-    renderer.setSize(drawWidth, drawHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, isCoarsePointer ? 1.35 : 2));
-    renderer.setClearColor(0x000000, 0);
-    renderer.toneMapping = THREE.NoToneMapping;
-    ico.appendChild(renderer.domElement);
+  const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
 
-    const ambient = new THREE.AmbientLight(0xffffff, 0.62);
-    const keyLight = new THREE.DirectionalLight(0xffffff, 0.86);
-    keyLight.position.set(24, 46, 32);
-    const fillLight = new THREE.DirectionalLight(0xffffff, 0.3);
-    fillLight.position.set(-28, 14, -18);
-    scene.add(ambient);
-    scene.add(keyLight);
-    scene.add(fillLight);
+  function updatePointerTarget(clientX, clientY) {
+    const rect = ico.getBoundingClientRect();
+    const nx = ((clientX - rect.left) / rect.width - 0.5) * 2;
+    const ny = ((clientY - rect.top) / rect.height - 0.5) * 2;
+    const x = clamp(nx, -1, 1);
+    const y = clamp(ny, -1, 1);
 
-    const modelRoot = new THREE.Group();
-    scene.add(modelRoot);
-
-    const clamp01 = (n) => Math.min(1, Math.max(0, n));
-    const quantize = (v, cells = 16) => {
-      const clamped = clamp01(v);
-      const cell = Math.min(cells - 1, Math.max(0, Math.floor(clamped * cells)));
-      return (cell + 0.5) / cells;
-    };
-    const textureLoader = new THREE.TextureLoader();
-
-    function configureNearestTexture(tex) {
-      tex.magFilter = THREE.NearestFilter;
-      tex.minFilter = THREE.NearestFilter;
-      tex.generateMipmaps = false;
-      tex.colorSpace = THREE.SRGBColorSpace;
-      tex.wrapS = THREE.ClampToEdgeWrapping;
-      tex.wrapT = THREE.ClampToEdgeWrapping;
-      tex.needsUpdate = true;
-      return tex;
-    }
-
-    function loadNearestTexture(url) {
-      return new Promise((resolve, reject) => {
-        textureLoader.load(
-          url,
-          (tex) => resolve(configureNearestTexture(tex)),
-          undefined,
-          () => reject(new Error(`tex-load:${url}`))
-        );
-      });
-    }
-
-    const textureMapsPromise = Promise.all([
-      loadNearestTexture(CRAFTING_COLOR_TEXTURES.top),
-      loadNearestTexture(CRAFTING_COLOR_TEXTURES.side),
-      loadNearestTexture(CRAFTING_COLOR_TEXTURES.front)
-    ]).then(([top, side, front]) => ({ top, side, front }));
-
-    function buildCraftingMappedGeometry(rawGeometry) {
-      const geometry = rawGeometry.index ? rawGeometry.toNonIndexed() : rawGeometry.clone();
-      geometry.computeBoundingBox();
-      const box = geometry.boundingBox;
-      if (!box) return geometry;
-
-      const dx = (box.max.x - box.min.x) || 1;
-      const dy = (box.max.y - box.min.y) || 1;
-      const dz = (box.max.z - box.min.z) || 1;
-      const pos = geometry.getAttribute('position');
-      if (!pos || (pos.count % 3) !== 0) return geometry;
-
-      const uv = new Float32Array(pos.count * 2);
-      geometry.clearGroups();
-
-      function setUv(idx, u, v) {
-        uv[idx * 2] = quantize(u);
-        uv[(idx * 2) + 1] = quantize(v);
-      }
-
-      for (let i = 0; i < pos.count; i += 3) {
-        const x0 = pos.getX(i);
-        const y0 = pos.getY(i);
-        const z0 = pos.getZ(i);
-        const x1 = pos.getX(i + 1);
-        const y1 = pos.getY(i + 1);
-        const z1 = pos.getZ(i + 1);
-        const x2 = pos.getX(i + 2);
-        const y2 = pos.getY(i + 2);
-        const z2 = pos.getZ(i + 2);
-
-        const e1x = x1 - x0;
-        const e1y = y1 - y0;
-        const e1z = z1 - z0;
-        const e2x = x2 - x0;
-        const e2y = y2 - y0;
-        const e2z = z2 - z0;
-        let nx = (e1y * e2z) - (e1z * e2y);
-        let ny = (e1z * e2x) - (e1x * e2z);
-        let nz = (e1x * e2y) - (e1y * e2x);
-        const nl = Math.hypot(nx, ny, nz) || 1;
-        nx /= nl;
-        ny /= nl;
-        nz /= nl;
-
-        const ax = Math.abs(nx);
-        const ay = Math.abs(ny);
-        const az = Math.abs(nz);
-        let materialIndex = 1;
-        let planeMode = 'side-y';
-        if (az >= ax && az >= ay) {
-          materialIndex = nz >= 0 ? 0 : 3;
-          planeMode = 'top';
-        } else if (ax >= ay) {
-          materialIndex = nx >= 0 ? 2 : 1;
-          planeMode = 'side-x';
-        }
-
-        const coords = [
-          [x0, y0, z0],
-          [x1, y1, z1],
-          [x2, y2, z2]
-        ];
-        for (let j = 0; j < 3; j += 1) {
-          const [x, y, z] = coords[j];
-          let u = 0;
-          let v = 0;
-          if (planeMode === 'top') {
-            u = (x - box.min.x) / dx;
-            v = (y - box.min.y) / dy;
-          } else if (planeMode === 'side-x') {
-            u = (y - box.min.y) / dy;
-            v = (z - box.min.z) / dz;
-          } else {
-            u = (x - box.min.x) / dx;
-            v = (z - box.min.z) / dz;
-          }
-          setUv(i + j, u, v);
-        }
-        geometry.addGroup(i, 3, materialIndex);
-      }
-
-      geometry.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
-      geometry.computeVertexNormals();
-      return geometry;
-    }
-
-    function setModelGeometry(rawGeometry, textures) {
-      const geometry = buildCraftingMappedGeometry(rawGeometry);
-      geometry.computeVertexNormals();
-      geometry.computeBoundingBox();
-      geometry.center();
-
-      const size = new THREE.Vector3();
-      geometry.boundingBox.getSize(size);
-      const maxDim = Math.max(size.x, size.y, size.z) || 1;
-      const targetSize = isCoarsePointer ? 27 : 31;
-      const scale = targetSize / maxDim;
-
-      const topMat = new THREE.MeshLambertMaterial({ map: textures.top, color: 0xffffff });
-      const sideMat = new THREE.MeshLambertMaterial({ map: textures.side, color: 0xffffff });
-      const frontMat = new THREE.MeshLambertMaterial({ map: textures.front, color: 0xffffff });
-      const bottomMat = new THREE.MeshLambertMaterial({ map: textures.side, color: 0x8e7a5c });
-      const mesh = new THREE.Mesh(geometry, [topMat, sideMat, frontMat, bottomMat]);
-
-      // Most printable STLs are Z-up; rotate into Three.js Y-up.
-      mesh.rotation.x = -Math.PI / 2;
-      mesh.scale.setScalar(scale);
-      modelRoot.clear();
-      modelRoot.add(mesh);
-    }
-
-    function setFallbackModel() {
-      const geometry = new THREE.BoxGeometry(34, 34, 34);
-      const material = new THREE.MeshStandardMaterial({
-        color: 0xbd9667,
-        roughness: 0.84,
-        metalness: 0.02,
-        wireframe: true
-      });
-      const mesh = new THREE.Mesh(geometry, material);
-      modelRoot.clear();
-      modelRoot.add(mesh);
-    }
-
-    function parseBinaryStl(arrayBuffer) {
-      if (arrayBuffer.byteLength < 84) return null;
-      const dv = new DataView(arrayBuffer);
-      const faceCount = dv.getUint32(80, true);
-      const expected = 84 + (faceCount * 50);
-      if (expected > arrayBuffer.byteLength || faceCount === 0) return null;
-
-      const vertices = new Float32Array(faceCount * 9);
-      let offset = 84;
-      let idx = 0;
-      for (let i = 0; i < faceCount; i += 1) {
-        offset += 12; // normal
-        for (let v = 0; v < 3; v += 1) {
-          vertices[idx] = dv.getFloat32(offset, true);
-          vertices[idx + 1] = dv.getFloat32(offset + 4, true);
-          vertices[idx + 2] = dv.getFloat32(offset + 8, true);
-          idx += 3;
-          offset += 12;
-        }
-        offset += 2; // attribute byte count
-      }
-      const geometry = new THREE.BufferGeometry();
-      geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
-      return geometry;
-    }
-
-    function parseAsciiStl(text) {
-      const vertexPattern = /vertex\s+([+-]?(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?)\s+([+-]?(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?)\s+([+-]?(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?)/g;
-      const vertices = [];
-      let match = null;
-      while ((match = vertexPattern.exec(text)) !== null) {
-        vertices.push(parseFloat(match[1]), parseFloat(match[2]), parseFloat(match[3]));
-      }
-      if (vertices.length < 9 || (vertices.length % 9) !== 0) return null;
-      const geometry = new THREE.BufferGeometry();
-      geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
-      return geometry;
-    }
-
-    function parseStl(arrayBuffer) {
-      const headBytes = new Uint8Array(arrayBuffer, 0, Math.min(arrayBuffer.byteLength, 256));
-      const header = new TextDecoder('ascii').decode(headBytes).trimStart().toLowerCase();
-      const looksAscii = header.startsWith('solid');
-
-      if (looksAscii) {
-        const ascii = new TextDecoder().decode(arrayBuffer);
-        const asciiGeom = parseAsciiStl(ascii);
-        if (asciiGeom) return asciiGeom;
-      }
-
-      const binaryGeom = parseBinaryStl(arrayBuffer);
-      if (binaryGeom) return binaryGeom;
-
-      if (!looksAscii) {
-        const ascii = new TextDecoder().decode(arrayBuffer);
-        return parseAsciiStl(ascii);
-      }
-
-      return null;
-    }
-
-    fetch(CRAFTING_MODEL_URL)
-      .then((res) => {
-        if (!res.ok) throw new Error(`stl http ${res.status}`);
-        return res.arrayBuffer();
-      })
-      .then((buf) => {
-        const geometry = parseStl(buf);
-        if (!geometry) throw new Error('stl parse failed');
-        return textureMapsPromise.then((textures) => ({ geometry, textures }));
-      })
-      .then(({ geometry, textures }) => {
-        setModelGeometry(geometry, textures);
-      })
-      .catch(() => {
-        setFallbackModel();
-      });
-
-    let pulseEnergy = 0;
-    let baseScale = 1;
-    let smoothScale = 1;
-    let tiltX = 0.11;
-    let rotY = 0;
-    let velX = 0;
-    let velY = idleSpin;
-    let pointerYaw = 0;
-    let pointerPitch = 0;
-    let pointerInside = false;
-    let lastMoveAt = 0;
-
-    function animate() {
-      const now = performance.now();
-      const pointerDriving = pointerInside && (now - lastMoveAt) < 230;
-
-      pointerYaw *= 0.9;
-      pointerPitch *= 0.9;
-
-      const targetVelY = pointerDriving ? pointerYaw : idleSpin;
-      const targetVelX = pointerDriving ? pointerPitch : 0;
-      velY += (targetVelY - velY) * (pointerDriving ? 0.42 : 0.06);
-      velX += (targetVelX - velX) * (pointerDriving ? 0.37 : 0.1);
-
-      tiltX = Math.max(-0.35, Math.min(0.35, tiltX + velX));
-      rotY += velY;
-
-      if (pulseEnergy > 0) {
-        pulseEnergy *= 0.89;
-        if (pulseEnergy < 0.02) pulseEnergy = 0;
-      }
-
-      const pulseScale = 1 + pulseEnergy * 0.055;
-      const targetScale = baseScale * pulseScale;
-      smoothScale += (targetScale - smoothScale) * 0.2;
-      modelRoot.scale.setScalar(smoothScale);
-      modelRoot.rotation.set(tiltX, rotY, 0);
-
-      renderer.render(scene, camera);
-      requestAnimationFrame(animate);
-    }
-    animate();
-
-    function resize() {
-      const w = ico.clientWidth || width;
-      const h = ico.clientHeight || height;
-      const dw = Math.round(w * canvasOverscan);
-      const dh = Math.round(h * canvasOverscan);
-      camera.aspect = dw / dh;
-      camera.updateProjectionMatrix();
-      renderer.setSize(dw, dh);
-    }
-    window.addEventListener('resize', resize);
-
-    if (allowPointerDrive) {
-      ico.addEventListener('pointerenter', () => {
-        pointerInside = true;
-        baseScale = 1.06;
-      });
-      ico.addEventListener('pointermove', (e) => {
-        lastMoveAt = performance.now();
-        const dx = Math.max(-16, Math.min(16, e.movementX || 0));
-        const dy = Math.max(-16, Math.min(16, e.movementY || 0));
-        pointerYaw = Math.max(-0.072, Math.min(0.072, dx * 0.00345));
-        pointerPitch = Math.max(-0.045, Math.min(0.045, dy * 0.0027));
-      });
-      ico.addEventListener('pointerleave', () => {
-        pointerInside = false;
-        baseScale = 1;
-        pointerYaw *= 0.45;
-        pointerPitch *= 0.45;
-      });
-    } else {
-      ico.addEventListener('pointerdown', () => {
-        baseScale = 1.03;
-      });
-      ico.addEventListener('pointerup', () => {
-        baseScale = 1;
-      });
-      ico.addEventListener('pointercancel', () => {
-        baseScale = 1;
-      });
-    }
-    ico.addEventListener('click', () => {
-      pulseEnergy = 1;
-      ico.classList.remove('rippling');
-      ico.classList.remove('pulse');
-      void ico.offsetWidth;
-      ico.classList.add('rippling');
-      ico.classList.add('pulse');
-    });
+    targetX = x * 16;
+    targetY = y * 12;
+    targetRot = x * 11;
   }
+
+  function onPointerMove(e) {
+    if (!pointerInside) return;
+    updatePointerTarget(e.clientX, e.clientY);
+  }
+
+  ico.addEventListener('pointerenter', (e) => {
+    pointerInside = true;
+    targetScale = 1.1;
+    updatePointerTarget(e.clientX, e.clientY);
+  });
+
+  ico.addEventListener('pointermove', onPointerMove);
+  window.addEventListener('pointermove', onPointerMove, { passive: true });
+
+  ico.addEventListener('pointerleave', () => {
+    pointerInside = false;
+    targetX = 0;
+    targetY = 0;
+    targetRot = 0;
+    targetScale = 1;
+  });
+
+  ico.addEventListener('pointerdown', (e) => {
+    targetScale = 1.06;
+    updatePointerTarget(e.clientX, e.clientY);
+  });
+
+  const onPointerRelease = () => {
+    targetScale = pointerInside ? 1.1 : 1;
+  };
+  ico.addEventListener('pointerup', onPointerRelease);
+  ico.addEventListener('pointercancel', onPointerRelease);
+
+  ico.addEventListener('click', () => {
+    pulseEnergy = 1;
+    ico.classList.remove('rippling');
+    ico.classList.remove('pulse');
+    void ico.offsetWidth;
+    ico.classList.add('rippling');
+    ico.classList.add('pulse');
+  });
+
+  function animate() {
+    idlePhase += 0.022;
+    const idleX = Math.sin(idlePhase * 0.78) * 1.7;
+    const idleY = Math.sin(idlePhase * 1.06) * 1.15;
+    const idleRot = Math.sin(idlePhase * 0.56) * 1.5;
+
+    if (pulseEnergy > 0) {
+      pulseEnergy *= 0.88;
+      if (pulseEnergy < 0.01) pulseEnergy = 0;
+    }
+
+    const follow = pointerInside ? 0.38 : 0.16;
+    smoothX += ((targetX + idleX) - smoothX) * follow;
+    smoothY += ((targetY + idleY) - smoothY) * follow;
+    smoothRot += ((targetRot + idleRot) - smoothRot) * follow;
+
+    const pulseScale = 1 + (pulseEnergy * 0.07);
+    smoothScale += (((targetScale * pulseScale) - smoothScale) * 0.24);
+
+    sprite.style.transform = `translate3d(${smoothX.toFixed(2)}px, ${smoothY.toFixed(2)}px, 0) rotate(${smoothRot.toFixed(2)}deg) scale(${smoothScale.toFixed(3)})`;
+    requestAnimationFrame(animate);
+  }
+
+  animate();
 })();
 
 (function calModal() {
