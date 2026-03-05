@@ -275,34 +275,45 @@
   });
 })();
 
-(function heroCraftingSprite() {
+(function heroCraftingCube() {
   const ico = document.getElementById('heroIcosa');
   if (!ico) return;
 
   ico.textContent = '';
-  const sprite = document.createElement('img');
-  sprite.className = 'hero-crafting-sprite';
-  sprite.src = '/src/crafting_table_front.png';
-  sprite.alt = '';
-  sprite.draggable = false;
-  sprite.setAttribute('aria-hidden', 'true');
-  ico.appendChild(sprite);
+  const cube = document.createElement('div');
+  cube.className = 'hero-crafting-cube';
+  cube.setAttribute('aria-hidden', 'true');
+  ico.appendChild(cube);
+
+  ['front', 'back', 'right', 'left', 'top', 'bottom'].forEach((name) => {
+    const face = document.createElement('div');
+    face.className = `cube-face cube-${name}`;
+    cube.appendChild(face);
+  });
 
   let pointerInside = false;
-  let targetX = 0;
-  let targetY = 0;
-  let targetRot = 0;
+  let pointerYaw = 0;
+  let pointerPitch = 0;
   let targetScale = 1;
+  let baseYaw = 32;
+  const basePitch = -18;
 
-  let smoothX = 0;
-  let smoothY = 0;
-  let smoothRot = 0;
+  let smoothYaw = baseYaw;
+  let smoothPitch = basePitch;
   let smoothScale = 1;
-
   let pulseEnergy = 0;
-  let idlePhase = Math.random() * Math.PI * 2;
+  let lastTick = performance.now();
 
   const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
+
+  function updateCubeSizing() {
+    const size = Math.min(ico.clientWidth || 140, ico.clientHeight || 140) * 0.76;
+    cube.style.setProperty('--cube-size', `${size.toFixed(2)}px`);
+    cube.style.setProperty('--cube-depth', `${(size * 0.5).toFixed(2)}px`);
+  }
+
+  updateCubeSizing();
+  window.addEventListener('resize', updateCubeSizing);
 
   function updatePointerTarget(clientX, clientY) {
     const rect = ico.getBoundingClientRect();
@@ -310,41 +321,35 @@
     const ny = ((clientY - rect.top) / rect.height - 0.5) * 2;
     const x = clamp(nx, -1, 1);
     const y = clamp(ny, -1, 1);
-
-    targetX = x * 16;
-    targetY = y * 12;
-    targetRot = x * 11;
-  }
-
-  function onPointerMove(e) {
-    if (!pointerInside) return;
-    updatePointerTarget(e.clientX, e.clientY);
+    pointerYaw = x * 58;
+    pointerPitch = -y * 34;
   }
 
   ico.addEventListener('pointerenter', (e) => {
     pointerInside = true;
-    targetScale = 1.1;
+    targetScale = 1.08;
     updatePointerTarget(e.clientX, e.clientY);
   });
 
-  ico.addEventListener('pointermove', onPointerMove);
-  window.addEventListener('pointermove', onPointerMove, { passive: true });
+  ico.addEventListener('pointermove', (e) => {
+    if (!pointerInside) return;
+    updatePointerTarget(e.clientX, e.clientY);
+  });
 
   ico.addEventListener('pointerleave', () => {
     pointerInside = false;
-    targetX = 0;
-    targetY = 0;
-    targetRot = 0;
+    pointerYaw = 0;
+    pointerPitch = 0;
     targetScale = 1;
   });
 
   ico.addEventListener('pointerdown', (e) => {
-    targetScale = 1.06;
+    targetScale = 1.05;
     updatePointerTarget(e.clientX, e.clientY);
   });
 
   const onPointerRelease = () => {
-    targetScale = pointerInside ? 1.1 : 1;
+    targetScale = pointerInside ? 1.08 : 1;
   };
   ico.addEventListener('pointerup', onPointerRelease);
   ico.addEventListener('pointercancel', onPointerRelease);
@@ -358,30 +363,33 @@
     ico.classList.add('pulse');
   });
 
-  function animate() {
-    idlePhase += 0.022;
-    const idleX = Math.sin(idlePhase * 0.78) * 1.7;
-    const idleY = Math.sin(idlePhase * 1.06) * 1.15;
-    const idleRot = Math.sin(idlePhase * 0.56) * 1.5;
+  function animate(now) {
+    const dt = Math.max(10, Math.min(34, now - lastTick || 16));
+    lastTick = now;
+
+    if (!pointerInside) {
+      baseYaw += dt * 0.04;
+    }
 
     if (pulseEnergy > 0) {
-      pulseEnergy *= 0.88;
+      pulseEnergy *= 0.9;
       if (pulseEnergy < 0.01) pulseEnergy = 0;
     }
 
-    const follow = pointerInside ? 0.38 : 0.16;
-    smoothX += ((targetX + idleX) - smoothX) * follow;
-    smoothY += ((targetY + idleY) - smoothY) * follow;
-    smoothRot += ((targetRot + idleRot) - smoothRot) * follow;
+    const desiredYaw = baseYaw + pointerYaw;
+    const desiredPitch = basePitch + pointerPitch;
+
+    smoothYaw += (desiredYaw - smoothYaw) * (pointerInside ? 0.36 : 0.11);
+    smoothPitch += (desiredPitch - smoothPitch) * (pointerInside ? 0.3 : 0.1);
 
     const pulseScale = 1 + (pulseEnergy * 0.07);
     smoothScale += (((targetScale * pulseScale) - smoothScale) * 0.24);
 
-    sprite.style.transform = `translate3d(${smoothX.toFixed(2)}px, ${smoothY.toFixed(2)}px, 0) rotate(${smoothRot.toFixed(2)}deg) scale(${smoothScale.toFixed(3)})`;
+    cube.style.transform = `rotateX(${smoothPitch.toFixed(2)}deg) rotateY(${smoothYaw.toFixed(2)}deg) scale(${smoothScale.toFixed(3)})`;
     requestAnimationFrame(animate);
   }
 
-  animate();
+  requestAnimationFrame(animate);
 })();
 
 (function calModal() {
