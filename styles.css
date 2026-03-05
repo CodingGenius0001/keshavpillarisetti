@@ -246,6 +246,7 @@ body.modal-open {
   display: grid;
   place-items: center;
   overflow: visible;
+  touch-action: none;
   cursor: var(--cursor-pickaxe), auto;
   margin-top: -3.15rem;
   margin-bottom: 3rem;

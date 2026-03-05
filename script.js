@@ -374,12 +374,67 @@
     let yaw = Math.PI / 4;
     let lastTick = performance.now();
     const spinSpeed = isCoarse ? 0.0028 : 0.0036;
+    const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
+    const dragScale = isCoarse ? 0.0068 : 0.0054;
+    const maxOffsetX = isCoarse ? 0.86 : 0.98;
+    const maxOffsetY = isCoarse ? 0.62 : 0.72;
+    let targetOffsetX = 0;
+    let targetOffsetY = 0;
+    let smoothOffsetX = 0;
+    let smoothOffsetY = 0;
+    let dragPointerId = null;
+    let dragLastX = 0;
+    let dragLastY = 0;
 
     function setCube(cube) {
       scene.add(cube);
       mesh = cube;
       render();
     }
+
+    function beginDrag(e) {
+      if (!mesh) return;
+      dragPointerId = e.pointerId;
+      dragLastX = e.clientX;
+      dragLastY = e.clientY;
+      if (ico.setPointerCapture) {
+        try {
+          ico.setPointerCapture(e.pointerId);
+        } catch (_) {
+          // noop
+        }
+      }
+    }
+
+    function updateDrag(e) {
+      if (dragPointerId === null || e.pointerId !== dragPointerId) return;
+      const dx = e.clientX - dragLastX;
+      const dy = e.clientY - dragLastY;
+      dragLastX = e.clientX;
+      dragLastY = e.clientY;
+      targetOffsetX = clamp(targetOffsetX + (dx * dragScale), -maxOffsetX, maxOffsetX);
+      targetOffsetY = clamp(targetOffsetY - (dy * dragScale), -maxOffsetY, maxOffsetY);
+    }
+
+    function endDrag(e) {
+      if (dragPointerId === null || e.pointerId !== dragPointerId) return;
+      if (ico.hasPointerCapture && ico.hasPointerCapture(e.pointerId)) {
+        try {
+          ico.releasePointerCapture(e.pointerId);
+        } catch (_) {
+          // noop
+        }
+      }
+      dragPointerId = null;
+    }
+
+    ico.addEventListener('pointerdown', beginDrag);
+    ico.addEventListener('pointermove', updateDrag);
+    ico.addEventListener('pointerup', endDrag);
+    ico.addEventListener('pointercancel', endDrag);
+    ico.addEventListener('lostpointercapture', (e) => {
+      if (dragPointerId === e.pointerId) dragPointerId = null;
+    });
 
     function animate(now) {
       const dt = Math.max(0.55, Math.min(2.1, (now - lastTick) / 16.67));
@@ -391,7 +446,11 @@
 
     function render() {
       if (mesh) {
+        const follow = dragPointerId === null ? 0.14 : 0.34;
+        smoothOffsetX += (targetOffsetX - smoothOffsetX) * follow;
+        smoothOffsetY += (targetOffsetY - smoothOffsetY) * follow;
         mesh.rotation.set(0, yaw, 0);
+        mesh.position.set(smoothOffsetX, smoothOffsetY, 0);
         mesh.scale.setScalar(1);
       }
       renderer.render(scene, camera);
