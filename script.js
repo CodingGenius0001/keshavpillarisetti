@@ -321,7 +321,7 @@
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(34, drawWidth / drawHeight, 0.1, 100);
-    camera.position.set(0, 0.2, 4.4);
+    camera.position.set(1.35, 1.7, 3.6);
     camera.lookAt(0, 0, 0);
 
     const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
@@ -365,102 +365,28 @@
           new THREE.MeshLambertMaterial({ map: front, color: 0xe6e6e6 }) // back
         ];
         const cube = new THREE.Mesh(new THREE.BoxGeometry(1.7, 1.7, 1.7), mats);
-        scene.add(cube);
-        attachInteraction(cube);
+        setCube(cube);
       })
       .catch(failVisual);
 
-    let pointerInside = false;
-    let pointerYaw = 0;
-    let pointerPitch = 0;
-    let baseYaw = 0.62;
-    const basePitch = -0.34;
-    let smoothYaw = baseYaw;
-    let smoothPitch = basePitch;
-    let scaleBase = 1;
-    let smoothScale = 1;
-    let pulseEnergy = 0;
     let mesh = null;
+    const baseYaw = Math.PI / 4;
+    const basePitch = -0.68;
 
-    const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
-
-    function attachInteraction(cube) {
+    function setCube(cube) {
+      scene.add(cube);
       mesh = cube;
+      render();
     }
 
-    function setPointer(clientX, clientY) {
-      const rect = ico.getBoundingClientRect();
-      const nx = ((clientX - rect.left) / rect.width - 0.5) * 2;
-      const ny = ((clientY - rect.top) / rect.height - 0.5) * 2;
-      const x = clamp(nx, -1, 1);
-      const y = clamp(ny, -1, 1);
-      pointerYaw = x * 0.95;
-      pointerPitch = -y * 0.55;
-    }
-
-    ico.addEventListener('pointerenter', (e) => {
-      pointerInside = true;
-      scaleBase = 1.08;
-      setPointer(e.clientX, e.clientY);
-    });
-
-    ico.addEventListener('pointermove', (e) => {
-      if (!pointerInside) return;
-      setPointer(e.clientX, e.clientY);
-    });
-
-    ico.addEventListener('pointerleave', () => {
-      pointerInside = false;
-      pointerYaw = 0;
-      pointerPitch = 0;
-      scaleBase = 1;
-    });
-
-    ico.addEventListener('pointerdown', (e) => {
-      scaleBase = 1.04;
-      setPointer(e.clientX, e.clientY);
-    });
-
-    const onPointerRelease = () => {
-      scaleBase = pointerInside ? 1.08 : 1;
-    };
-    ico.addEventListener('pointerup', onPointerRelease);
-    ico.addEventListener('pointercancel', onPointerRelease);
-
-    ico.addEventListener('click', () => {
-      pulseEnergy = 1;
-      ico.classList.remove('rippling');
-      ico.classList.remove('pulse');
-      void ico.offsetWidth;
-      ico.classList.add('rippling');
-      ico.classList.add('pulse');
-    });
-
-    function animate() {
-      if (!pointerInside) baseYaw += isCoarse ? 0.0044 : 0.0061;
-
-      if (pulseEnergy > 0) {
-        pulseEnergy *= 0.9;
-        if (pulseEnergy < 0.01) pulseEnergy = 0;
-      }
-
-      const desiredYaw = baseYaw + pointerYaw;
-      const desiredPitch = basePitch + pointerPitch;
-      smoothYaw += (desiredYaw - smoothYaw) * (pointerInside ? 0.36 : 0.1);
-      smoothPitch += (desiredPitch - smoothPitch) * (pointerInside ? 0.3 : 0.1);
-
-      const pulseScale = 1 + (pulseEnergy * 0.07);
-      smoothScale += (((scaleBase * pulseScale) - smoothScale) * 0.24);
-
+    function render() {
       if (mesh) {
-        mesh.rotation.set(smoothPitch, smoothYaw, 0);
-        mesh.scale.setScalar(smoothScale);
+        mesh.rotation.set(basePitch, baseYaw, 0);
+        mesh.scale.setScalar(1);
       }
-
       renderer.render(scene, camera);
-      requestAnimationFrame(animate);
     }
-    requestAnimationFrame(animate);
+    render();
 
     function onResize() {
       const w = ico.clientWidth || width;
@@ -470,6 +396,7 @@
       camera.aspect = dw / dh;
       camera.updateProjectionMatrix();
       renderer.setSize(dw, dh);
+      render();
     }
     window.addEventListener('resize', onResize);
   }
