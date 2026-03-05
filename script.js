@@ -455,7 +455,8 @@
 
     function render() {
       if (mesh) {
-        const follow = dragPointerId === null ? 0.16 : 0.35;
+        const isReturning = dragPointerId === null;
+        const follow = isReturning ? 0.085 : 0.35;
         smoothYawOffset += (targetYawOffset - smoothYawOffset) * follow;
         smoothPitchOffset += (targetPitchOffset - smoothPitchOffset) * follow;
         mesh.rotation.set(smoothPitchOffset, yaw + smoothYawOffset, 0);
