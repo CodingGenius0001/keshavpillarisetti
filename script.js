@@ -415,6 +415,11 @@
       targetPitchOffset = clampPitch(targetPitchOffset + (dy * dragPitchScale));
     }
 
+    function resetDragOffsets() {
+      targetYawOffset = 0;
+      targetPitchOffset = 0;
+    }
+
     function endDrag(e) {
       if (dragPointerId === null || e.pointerId !== dragPointerId) return;
       if (ico.hasPointerCapture && ico.hasPointerCapture(e.pointerId)) {
@@ -425,6 +430,7 @@
         }
       }
       dragPointerId = null;
+      resetDragOffsets();
     }
 
     ico.addEventListener('pointerdown', beginDrag);
@@ -433,7 +439,10 @@
     ico.addEventListener('pointerup', endDrag);
     ico.addEventListener('pointercancel', endDrag);
     ico.addEventListener('lostpointercapture', (e) => {
-      if (dragPointerId === e.pointerId) dragPointerId = null;
+      if (dragPointerId === e.pointerId) {
+        dragPointerId = null;
+        resetDragOffsets();
+      }
     });
 
     function animate(now) {
@@ -446,7 +455,7 @@
 
     function render() {
       if (mesh) {
-        const follow = dragPointerId === null ? 0.1 : 0.35;
+        const follow = dragPointerId === null ? 0.16 : 0.35;
         smoothYawOffset += (targetYawOffset - smoothYawOffset) * follow;
         smoothPitchOffset += (targetPitchOffset - smoothPitchOffset) * follow;
         mesh.rotation.set(smoothPitchOffset, yaw + smoothYawOffset, 0);
