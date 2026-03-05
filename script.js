@@ -457,7 +457,11 @@
       if (mesh) {
         const isReturning = dragPointerId === null;
         const follow = isReturning ? 0.045 : 0.35;
-        smoothYawOffset += (targetYawOffset - smoothYawOffset) * follow;
+        const yawDelta = Math.atan2(
+          Math.sin(targetYawOffset - smoothYawOffset),
+          Math.cos(targetYawOffset - smoothYawOffset)
+        );
+        smoothYawOffset += yawDelta * follow;
         smoothPitchOffset += (targetPitchOffset - smoothPitchOffset) * follow;
         mesh.rotation.set(smoothPitchOffset, yaw + smoothYawOffset, 0);
         mesh.position.set(0, 0, 0);
