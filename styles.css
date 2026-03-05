@@ -400,15 +400,17 @@ body.modal-open {
 }
 
 .cta.primary {
-  background: linear-gradient(135deg, var(--primary), var(--accent));
-  color: #fff;
-  border-color: transparent;
-  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.25);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text);
+  border-color: var(--border);
+  box-shadow: var(--shadow-sm);
 }
 
 .cta.primary:hover {
-  transform: translateY(-2px) scale(1.01);
-  box-shadow: 0 12px 28px rgba(37, 99, 235, 0.3);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--border-hover);
+  background: rgba(255, 255, 255, 0.16);
 }
 
 .cal-modal[hidden] { display: none; }
