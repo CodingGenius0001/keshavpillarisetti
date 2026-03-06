@@ -133,11 +133,8 @@
       .map((row) => row.split('').map((ch) => ch + ch).join(''))
       .flatMap((row) => [row, row])
   );
-  const LEAF_SPRITES_8 = [
-    ['02333230', '23323332', '33233323', '33303233', '32333323', '33332333', '23333332', '03233020'],
-    ['23323330', '33233323', '23330332', '33323323', '32333332', '33332323', '23333330', '02323020'],
-    ['03233320', '23323332', '33333323', '32303333', '33332323', '23333332', '32333230', '00232300']
-  ];
+  const leafTexture = new Image();
+  leafTexture.src = '/src/oak_leaves.png';
 
   function resize() {
     canvas.width = window.innerWidth;
@@ -171,8 +168,7 @@
       vy: 0.35 + Math.random() * 0.55,
       swing: 1.1 + Math.random() * 1.1,
       phase: Math.random() * Math.PI * 2,
-      alpha: 0.65 + Math.random() * 0.25,
-      variant: Math.floor(Math.random() * LEAF_SPRITES_8.length)
+      alpha: 0.65 + Math.random() * 0.25
     });
   }
 
@@ -205,6 +201,16 @@
     drawSprite(x, y, drawSize, ORB_FRAMES[frameIndex], orbPalette, 16);
   }
 
+  function drawLeaf(x, y, size, alpha) {
+    if (!leafTexture.complete || !leafTexture.naturalWidth) return;
+    const drawSize = Math.max(12, Math.round(size));
+    const left = Math.round(x - drawSize / 2);
+    const top = Math.round(y - drawSize / 2);
+    ctx.globalAlpha = alpha;
+    ctx.drawImage(leafTexture, left, top, drawSize, drawSize);
+    ctx.globalAlpha = 1;
+  }
+
   function draw(time) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.imageSmoothingEnabled = false;
@@ -224,13 +230,7 @@
         continue;
       }
 
-      const base = 34 + Math.sin(t * 1.2 + l.phase) * 4;
-      const leafPalette = {
-        '1': `hsla(102, 24%, ${base - 8}%, ${l.alpha})`,
-        '2': `hsla(106, 30%, ${base}%, ${l.alpha})`,
-        '3': `hsla(96, 28%, ${base + 7}%, ${l.alpha})`
-      };
-      drawSprite(l.x, l.y, l.size, LEAF_SPRITES_8[l.variant], leafPalette, 8);
+      drawLeaf(l.x, l.y, l.size, l.alpha);
     }
 
     orbs.forEach((p) => {
