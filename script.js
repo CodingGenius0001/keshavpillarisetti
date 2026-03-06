@@ -348,9 +348,9 @@
 
   const THREE_URL = 'https://unpkg.com/three@0.160.0/build/three.min.js';
   const TEX = {
-    top: '/src/enchanting_table_top.png',
-    side: '/src/enchanting_table_side.png',
-    bottom: '/src/enchanting_table_bottom.png'
+    top: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAAHlBMVEX////D+/Gi9udK7dEszbGiKSl0HTJ/ByhYFixrAC8DkiHoAAAATElEQVR42mNgFJkJBI4CDELKpaGh4UaKCIazeWhYamixCcP00rCOjtTwSoapoRkdHW2hkUBGBxCAGGEgRiqcgZCCK4ZrRxiIaRfMGQCJpTAVX3ynKQAAAABJRU5ErkJggg==',
+    side: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAAKlBMVEUAAAD////D+/Gi9udK7dEszbGiKSk7J1R/ByhrAC8nHj0QDBwGAwsAAAHmTmT4AAAAAXRSTlMAQObYZgAAAHpJREFUeNpjYoACJjwMIdWZQBCkyCTI///s2Q8fBYFSjgwMIkApQ3EWA2aHQmGmzvx7zsb3vpcxnVNmvKigoCDIJPhBQFGA6SMfk/z/jwy/5/5/yPRmvdyHB05/GJkeO35UEBEQ+8BkIPDhosBHBgOmR/wKfJ/4/38AAKCdJ29jwsr7AAAAAElFTkSuQmCC',
+    bottom: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAAD1BMVEU7J1QnHj0QDBwGAwsAAAFbDTSxAAAAaUlEQVR42gVAARGAMAj8mUA3AzhYAOUJoED/TB68Ut/xNLiFb9wVhfPpaybePs3KHJ+sqmRCVpCNBbG9+ekJvySq3hPVZI7qgl56aBihTmPph+Cyu4ng3kJ2vRSHMoQ+8FGHLU9o5FwkfyEoFb7iY82bAAAAAElFTkSuQmCC'
   };
 
   const loadScript = (src, readyCheck, onReady, onError) => {
