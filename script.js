@@ -133,12 +133,44 @@
       .map((row) => row.split('').map((ch) => ch + ch).join(''))
       .flatMap((row) => [row, row])
   );
-  const leafTextures = Array.from({ length: 12 }, (_, i) => {
+  const leafTextures = [];
+  const tintedLeafTextures = [];
+
+  function buildTintedLeaf(img) {
+    const width = img.naturalWidth || img.width;
+    const height = img.naturalHeight || img.height;
+    if (!width || !height) return null;
+    const offscreen = document.createElement('canvas');
+    offscreen.width = width;
+    offscreen.height = height;
+    const octx = offscreen.getContext('2d', { willReadFrequently: true });
+    if (!octx) return null;
+    octx.imageSmoothingEnabled = false;
+    octx.drawImage(img, 0, 0, width, height);
+    const imageData = octx.getImageData(0, 0, width, height);
+    const data = imageData.data;
+    for (let i = 0; i < data.length; i += 4) {
+      const alpha = data[i + 3];
+      if (!alpha) continue;
+      const luma = (data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114) / 255;
+      data[i] = Math.round(68 + luma * 104);
+      data[i + 1] = Math.round(148 + luma * 102);
+      data[i + 2] = Math.round(52 + luma * 70);
+      data[i + 3] = Math.min(255, Math.round(alpha * 0.95));
+    }
+    octx.putImageData(imageData, 0, 0);
+    return offscreen;
+  }
+
+  for (let i = 0; i < 12; i += 1) {
     const img = new Image();
+    img.onload = () => {
+      tintedLeafTextures[i] = buildTintedLeaf(img);
+    };
     img.src = `/src/cherry_${i}.png`;
-    return img;
-  });
-  const LEAF_TINT = 'rgba(172, 232, 156, 0.82)';
+    leafTextures.push(img);
+    tintedLeafTextures.push(null);
+  }
 
   function resize() {
     canvas.width = window.innerWidth;
@@ -209,9 +241,10 @@
   }
 
   function drawLeaf(x, y, size, alpha, angle, variant) {
-    const tex = leafTextures[variant] || leafTextures[0];
-    if (!tex || !tex.complete || !tex.naturalWidth) return;
-    const drawSize = Math.max(9, Math.round(size));
+    const tex = tintedLeafTextures[variant] || leafTextures[variant] || leafTextures[0];
+    const texWidth = tex ? tex.naturalWidth || tex.width : 0;
+    if (!tex || !texWidth) return;
+    const drawSize = Math.max(10, Math.round(size));
     ctx.save();
     ctx.translate(Math.round(x), Math.round(y));
     ctx.rotate(angle);
@@ -219,10 +252,6 @@
     const left = Math.round(-drawSize / 2);
     const top = Math.round(-drawSize / 2);
     ctx.drawImage(tex, left, top, drawSize, drawSize);
-    ctx.globalCompositeOperation = 'source-atop';
-    ctx.fillStyle = LEAF_TINT;
-    ctx.fillRect(left, top, drawSize, drawSize);
-    ctx.globalCompositeOperation = 'source-over';
     ctx.restore();
     ctx.globalAlpha = 1;
   }
