@@ -342,16 +342,11 @@
   });
 })();
 
-(function heroCraftingCube() {
+(function heroEnchantingTable() {
   const ico = document.getElementById('heroIcosa');
   if (!ico) return;
 
   const THREE_URL = 'https://unpkg.com/three@0.160.0/build/three.min.js';
-  const TEX = {
-    top: '/src/crafting_table_top.png',
-    side: '/src/crafting_table_side.png',
-    front: '/src/crafting_table_front.png'
-  };
 
   const loadScript = (src, readyCheck, onReady, onError) => {
     if (readyCheck()) return onReady();
@@ -365,10 +360,8 @@
   };
 
   const failVisual = () => {
-    ico.style.backgroundImage = `url("${TEX.front}")`;
-    ico.style.backgroundSize = 'contain';
-    ico.style.backgroundPosition = 'center';
-    ico.style.backgroundRepeat = 'no-repeat';
+    ico.style.background = 'radial-gradient(circle at 50% 45%, rgba(123, 88, 195, 0.45), rgba(20, 21, 36, 0.08) 68%)';
+    ico.style.borderRadius = '12px';
   };
 
   loadScript(
@@ -399,45 +392,120 @@
     ico.textContent = '';
     ico.appendChild(renderer.domElement);
 
-    const ambient = new THREE.AmbientLight(0xffffff, 0.74);
-    const key = new THREE.DirectionalLight(0xffffff, 0.8);
-    key.position.set(2, 3, 3);
-    const fill = new THREE.DirectionalLight(0xffffff, 0.34);
-    fill.position.set(-2, 1.2, -1.2);
-    scene.add(ambient, key, fill);
+    const ambient = new THREE.AmbientLight(0xffffff, 0.62);
+    const key = new THREE.DirectionalLight(0xf5ecff, 0.95);
+    key.position.set(2.8, 3.1, 2.3);
+    const fill = new THREE.DirectionalLight(0x90b8ff, 0.46);
+    fill.position.set(-2.2, 1.8, -1.8);
+    const rim = new THREE.DirectionalLight(0x6f48c2, 0.42);
+    rim.position.set(0, 2.8, -3.1);
+    scene.add(ambient, key, fill, rim);
 
-    const loader = new THREE.TextureLoader();
-    const configureTexture = (tex) => {
-      tex.magFilter = THREE.NearestFilter;
-      tex.minFilter = THREE.NearestFilter;
-      tex.generateMipmaps = false;
-      tex.colorSpace = THREE.SRGBColorSpace;
-      tex.wrapS = THREE.ClampToEdgeWrapping;
-      tex.wrapT = THREE.ClampToEdgeWrapping;
-      tex.needsUpdate = true;
-      return tex;
-    };
-    const loadTexture = (url) => new Promise((resolve, reject) => {
-      loader.load(url, (tex) => resolve(configureTexture(tex)), undefined, () => reject(new Error(url)));
+    const world = new THREE.Group();
+    scene.add(world);
+
+    const obsidianDark = new THREE.MeshLambertMaterial({ color: 0x151225 });
+    const obsidianFace = new THREE.MeshLambertMaterial({ color: 0x201a35 });
+    const carpet = new THREE.MeshLambertMaterial({ color: 0x7b1737 });
+    const runeInlay = new THREE.MeshLambertMaterial({
+      color: 0x251438,
+      emissive: 0x4f1d78,
+      emissiveIntensity: 0.42
+    });
+    const gem = new THREE.MeshLambertMaterial({
+      color: 0x2a8add,
+      emissive: 0x1b4f9d,
+      emissiveIntensity: 0.58
+    });
+    const page = new THREE.MeshLambertMaterial({ color: 0xe6ddb9 });
+    const pageEdge = new THREE.MeshLambertMaterial({ color: 0xcfc49c });
+    const bookCover = new THREE.MeshLambertMaterial({ color: 0x742238 });
+    const bookSpine = new THREE.MeshLambertMaterial({ color: 0x4f1222 });
+
+    const tableBase = new THREE.Mesh(
+      new THREE.BoxGeometry(1.78, 0.78, 1.78),
+      [obsidianFace, obsidianFace, obsidianDark, obsidianDark, obsidianFace, obsidianFace]
+    );
+    tableBase.position.y = -0.24;
+    world.add(tableBase);
+
+    const carpetTop = new THREE.Mesh(new THREE.BoxGeometry(1.72, 0.17, 1.72), carpet);
+    carpetTop.position.y = 0.24;
+    world.add(carpetTop);
+
+    const inlayTop = new THREE.Mesh(new THREE.BoxGeometry(0.96, 0.07, 0.96), runeInlay);
+    inlayTop.position.y = 0.36;
+    world.add(inlayTop);
+
+    const ringThickness = 0.06;
+    const ringHeight = 0.08;
+    const ringMat = new THREE.MeshLambertMaterial({ color: 0x3f2148, emissive: 0x5e2c78, emissiveIntensity: 0.33 });
+    const ringPieces = [
+      [0, 0.38, 0.49, 0.98, ringHeight, ringThickness],
+      [0, 0.38, -0.49, 0.98, ringHeight, ringThickness],
+      [0.49, 0.38, 0, ringThickness, ringHeight, 0.98],
+      [-0.49, 0.38, 0, ringThickness, ringHeight, 0.98]
+    ];
+    ringPieces.forEach(([x, y, z, w, h, d]) => {
+      const piece = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), ringMat);
+      piece.position.set(x, y, z);
+      world.add(piece);
     });
 
-    Promise.all([loadTexture(TEX.top), loadTexture(TEX.side), loadTexture(TEX.front)])
-      .then(([top, side, front]) => {
-        const mats = [
-          new THREE.MeshLambertMaterial({ map: side, color: 0xf2f2f2 }), // right
-          new THREE.MeshLambertMaterial({ map: side, color: 0xe8e8e8 }), // left
-          new THREE.MeshLambertMaterial({ map: top, color: 0xffffff }), // top
-          new THREE.MeshLambertMaterial({ map: side, color: 0x8d7a61 }), // bottom
-          new THREE.MeshLambertMaterial({ map: front, color: 0xffffff }), // front
-          new THREE.MeshLambertMaterial({ map: front, color: 0xe6e6e6 }) // back
-        ];
-        const cube = new THREE.Mesh(new THREE.BoxGeometry(1.34, 1.34, 1.34), mats);
-        setCube(cube);
-        requestAnimationFrame(animate);
-      })
-      .catch(failVisual);
+    const cornerPos = 0.68;
+    [-cornerPos, cornerPos].forEach((x) => {
+      [-cornerPos, cornerPos].forEach((z) => {
+        const bead = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.16, 0.16), gem);
+        bead.position.set(x, 0.33, z);
+        world.add(bead);
+      });
+    });
 
-    let mesh = null;
+    const bookHover = new THREE.Group();
+    bookHover.position.set(0, 0.86, 0);
+    world.add(bookHover);
+
+    const bookYaw = new THREE.Group();
+    bookHover.add(bookYaw);
+
+    const bookTilt = new THREE.Group();
+    bookYaw.add(bookTilt);
+    bookTilt.rotation.x = 0.22;
+
+    const pages = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.11, 0.44), page);
+    pages.position.y = 0.01;
+    bookTilt.add(pages);
+
+    const pageBand = new THREE.Mesh(new THREE.BoxGeometry(0.58, 0.014, 0.41), pageEdge);
+    pageBand.position.y = 0.067;
+    bookTilt.add(pageBand);
+
+    const spine = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.15, 0.47), bookSpine);
+    spine.position.y = 0.005;
+    bookTilt.add(spine);
+
+    const leftCoverPivot = new THREE.Group();
+    leftCoverPivot.position.set(-0.045, 0.01, 0);
+    bookTilt.add(leftCoverPivot);
+    const leftCover = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.04, 0.47), bookCover);
+    leftCover.position.x = -0.17;
+    leftCoverPivot.add(leftCover);
+
+    const rightCoverPivot = new THREE.Group();
+    rightCoverPivot.position.set(0.045, 0.01, 0);
+    bookTilt.add(rightCoverPivot);
+    const rightCover = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.04, 0.47), bookCover);
+    rightCover.position.x = 0.17;
+    rightCoverPivot.add(rightCover);
+
+    const leftPage = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.022, 0.4), pageEdge);
+    leftPage.position.set(-0.14, 0.03, 0);
+    leftCoverPivot.add(leftPage);
+
+    const rightPage = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.022, 0.4), pageEdge);
+    rightPage.position.set(0.14, 0.03, 0);
+    rightCoverPivot.add(rightPage);
+
     let yaw = Math.PI / 4;
     let lastTick = performance.now();
     const spinSpeed = isCoarse ? 0.0028 : 0.0036;
@@ -451,15 +519,10 @@
     let dragPointerId = null;
     let dragLastX = 0;
     let dragLastY = 0;
-
-    function setCube(cube) {
-      scene.add(cube);
-      mesh = cube;
-      render();
-    }
+    const bookPointer = { x: 0, y: 0, active: false };
+    const smoothBookPointer = { x: 0, y: 0 };
 
     function beginDrag(e) {
-      if (!mesh) return;
       dragPointerId = e.pointerId;
       dragLastX = e.clientX;
       dragLastY = e.clientY;
@@ -500,9 +563,23 @@
       resetDragOffsets();
     }
 
+    function updateBookPointer(e) {
+      if (!window.matchMedia('(pointer: fine)').matches) return;
+      bookPointer.active = true;
+      bookPointer.x = (e.clientX / Math.max(1, window.innerWidth)) * 2 - 1;
+      bookPointer.y = (e.clientY / Math.max(1, window.innerHeight)) * 2 - 1;
+    }
+
     ico.addEventListener('pointerdown', beginDrag);
     ico.addEventListener('pointermove', updateDrag);
     window.addEventListener('pointermove', updateDrag, { passive: true });
+    window.addEventListener('pointermove', updateBookPointer, { passive: true });
+    window.addEventListener('pointerleave', () => {
+      bookPointer.active = false;
+    });
+    window.addEventListener('blur', () => {
+      bookPointer.active = false;
+    });
     ico.addEventListener('pointerup', endDrag);
     ico.addEventListener('pointercancel', endDrag);
     ico.addEventListener('lostpointercapture', (e) => {
@@ -521,19 +598,40 @@
     }
 
     function render() {
-      if (mesh) {
-        const isReturning = dragPointerId === null;
-        const follow = isReturning ? 0.045 : 0.35;
-        const yawDelta = Math.atan2(
-          Math.sin(targetYawOffset - smoothYawOffset),
-          Math.cos(targetYawOffset - smoothYawOffset)
-        );
-        smoothYawOffset += yawDelta * follow;
-        smoothPitchOffset += (targetPitchOffset - smoothPitchOffset) * follow;
-        mesh.rotation.set(smoothPitchOffset, yaw + smoothYawOffset, 0);
-        mesh.position.set(0, 0, 0);
-        mesh.scale.setScalar(1);
-      }
+      const now = performance.now();
+      const t = now / 1000;
+      const isReturning = dragPointerId === null;
+      const follow = isReturning ? 0.045 : 0.35;
+      const yawDelta = Math.atan2(
+        Math.sin(targetYawOffset - smoothYawOffset),
+        Math.cos(targetYawOffset - smoothYawOffset)
+      );
+      smoothYawOffset += yawDelta * follow;
+      smoothPitchOffset += (targetPitchOffset - smoothPitchOffset) * follow;
+
+      world.rotation.set(smoothPitchOffset * 0.35, yaw + smoothYawOffset, 0);
+
+      const idleLookX = Math.sin(t * 0.58) * 0.2;
+      const idleLookY = Math.cos(t * 0.45) * 0.12;
+      const targetLookX = bookPointer.active ? bookPointer.x : idleLookX;
+      const targetLookY = bookPointer.active ? bookPointer.y : idleLookY;
+      const lookEase = bookPointer.active ? 0.115 : 0.05;
+      smoothBookPointer.x += (targetLookX - smoothBookPointer.x) * lookEase;
+      smoothBookPointer.y += (targetLookY - smoothBookPointer.y) * lookEase;
+
+      bookHover.position.y = 0.86 + Math.sin(t * 2.1) * 0.045;
+      const targetBookYaw = smoothBookPointer.x * 1.02;
+      const targetBookPitch = 0.23 - smoothBookPointer.y * 0.34 + Math.sin(t * 1.8) * 0.02;
+      bookYaw.rotation.y += (targetBookYaw - bookYaw.rotation.y) * 0.12;
+      bookTilt.rotation.x += (targetBookPitch - bookTilt.rotation.x) * 0.1;
+
+      const openAngle = 0.84 + Math.sin(t * 1.55) * 0.08 + Math.min(0.18, Math.abs(smoothBookPointer.x) * 0.28);
+      const pageSkew = smoothBookPointer.x * 0.22;
+      leftCoverPivot.rotation.y += (openAngle - leftCoverPivot.rotation.y) * 0.13;
+      rightCoverPivot.rotation.y += (-openAngle - rightCoverPivot.rotation.y) * 0.13;
+      leftPage.rotation.y += ((openAngle * 0.55 + pageSkew) - leftPage.rotation.y) * 0.11;
+      rightPage.rotation.y += ((-openAngle * 0.55 + pageSkew) - rightPage.rotation.y) * 0.11;
+
       renderer.render(scene, camera);
     }
     render();
