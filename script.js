@@ -413,18 +413,18 @@
     const pageEdge = new THREE.MeshLambertMaterial({ color: 0xd9cc9f });
     const bookCover = new THREE.MeshLambertMaterial({ color: 0x7a203a });
     const bookSpine = new THREE.MeshLambertMaterial({ color: 0x4f1222 });
-    const fallbackSide = new THREE.MeshLambertMaterial({ color: 0x2a1f3e });
-    const fallbackTop = new THREE.MeshLambertMaterial({ color: 0x6b1738 });
-    const fallbackBottom = new THREE.MeshLambertMaterial({ color: 0x15131e });
+    const fallbackSide = new THREE.MeshLambertMaterial({ color: 0x3f274f });
+    const fallbackTop = new THREE.MeshLambertMaterial({ color: 0x8a1a4a });
+    const fallbackBottom = new THREE.MeshLambertMaterial({ color: 0x1b1427 });
 
-    let tableBase = new THREE.Mesh(
-      new THREE.BoxGeometry(1.72, 1.08, 1.72),
+    const tableGeo = new THREE.BoxGeometry(1.72, 0.84, 1.72);
+    const tablePlaceholder = new THREE.Mesh(
+      tableGeo,
       [fallbackSide, fallbackSide, fallbackTop, fallbackBottom, fallbackSide, fallbackSide]
     );
-    tableBase.position.y = -0.08;
-    world.add(tableBase);
+    tablePlaceholder.position.y = -0.24;
+    world.add(tablePlaceholder);
 
-    const loader = new THREE.TextureLoader();
     const configureTexture = (tex) => {
       tex.magFilter = THREE.NearestFilter;
       tex.minFilter = THREE.NearestFilter;
@@ -435,14 +435,34 @@
       tex.needsUpdate = true;
       return tex;
     };
-    const loadTexture = (url) => new Promise((resolve, reject) => {
-      loader.load(url, (tex) => resolve(configureTexture(tex)), undefined, () => reject(new Error(url)));
+
+    const loadImage = (src) => new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = () => reject(new Error('image-load-failed'));
+      img.src = src;
     });
 
-    Promise.all([loadTexture(TEX.top), loadTexture(TEX.side), loadTexture(TEX.bottom)])
-      .then(([topTex, sideTex, bottomTex]) => {
-        world.remove(tableBase);
-        tableBase.geometry.dispose();
+    function makeTextureFromImage(img, options = {}) {
+      if (!options.cropSide) {
+        return configureTexture(new THREE.CanvasTexture(img));
+      }
+      const canvasEl = document.createElement('canvas');
+      canvasEl.width = 16;
+      canvasEl.height = 16;
+      const cctx = canvasEl.getContext('2d');
+      if (!cctx) return configureTexture(new THREE.CanvasTexture(img));
+      cctx.imageSmoothingEnabled = false;
+      // Side texture has 4 transparent rows at top; crop to visible 12 rows.
+      cctx.drawImage(img, 0, 4, 16, 12, 0, 0, 16, 16);
+      return configureTexture(new THREE.CanvasTexture(canvasEl));
+    }
+
+    Promise.all([loadImage(TEX.top), loadImage(TEX.side), loadImage(TEX.bottom)])
+      .then(([topImg, sideImg, bottomImg]) => {
+        const topTex = makeTextureFromImage(topImg);
+        const sideTex = makeTextureFromImage(sideImg, { cropSide: true });
+        const bottomTex = makeTextureFromImage(bottomImg);
         const texturedMaterials = [
           new THREE.MeshLambertMaterial({ map: sideTex, color: 0xffffff }),
           new THREE.MeshLambertMaterial({ map: sideTex, color: 0xffffff }),
@@ -451,16 +471,14 @@
           new THREE.MeshLambertMaterial({ map: sideTex, color: 0xffffff }),
           new THREE.MeshLambertMaterial({ map: sideTex, color: 0xffffff })
         ];
-        tableBase = new THREE.Mesh(new THREE.BoxGeometry(1.72, 1.08, 1.72), texturedMaterials);
-        tableBase.position.y = -0.08;
-        world.add(tableBase);
+        tablePlaceholder.material = texturedMaterials;
       })
       .catch(() => {
-        // Keep fallback table material if textures fail to load.
+        // Keep fallback material if image decode fails.
       });
 
     const bookHover = new THREE.Group();
-    bookHover.position.set(0, 0.74, 0);
+    bookHover.position.set(0, 0.66, 0);
     world.add(bookHover);
 
     const bookYaw = new THREE.Group();
@@ -617,7 +635,7 @@
       smoothBookPointer.x += (targetLookX - smoothBookPointer.x) * lookEase;
       smoothBookPointer.y += (targetLookY - smoothBookPointer.y) * lookEase;
 
-      bookHover.position.y = 0.74 + Math.sin(t * 2.1) * 0.045;
+      bookHover.position.y = 0.66 + Math.sin(t * 2.1) * 0.045;
       const targetBookYaw = smoothBookPointer.x * 1.02;
       const targetBookPitch = 0.23 - smoothBookPointer.y * 0.34 + Math.sin(t * 1.8) * 0.02;
       bookYaw.rotation.y += (targetBookYaw - bookYaw.rotation.y) * 0.12;
