@@ -133,8 +133,11 @@
       .map((row) => row.split('').map((ch) => ch + ch).join(''))
       .flatMap((row) => [row, row])
   );
-  const leafTexture = new Image();
-  leafTexture.src = '/src/oak_leaves.png';
+  const leafTextures = Array.from({ length: 12 }, (_, i) => {
+    const img = new Image();
+    img.src = `/src/cherry_${i}.png`;
+    return img;
+  });
 
   function resize() {
     canvas.width = window.innerWidth;
@@ -163,12 +166,15 @@
     leaves.push({
       x: Math.random() * canvas.width,
       y: -18 - Math.random() * 25,
-      size: 14 + Math.random() * 8,
+      size: 10 + Math.random() * 7,
       vx: (Math.random() - 0.5) * 0.25,
       vy: 0.35 + Math.random() * 0.55,
       swing: 1.1 + Math.random() * 1.1,
       phase: Math.random() * Math.PI * 2,
-      alpha: 0.65 + Math.random() * 0.25
+      alpha: 0.72 + Math.random() * 0.2,
+      angle: Math.random() * Math.PI * 2,
+      spin: (Math.random() - 0.5) * 0.045,
+      variant: Math.floor(Math.random() * leafTextures.length)
     });
   }
 
@@ -201,13 +207,16 @@
     drawSprite(x, y, drawSize, ORB_FRAMES[frameIndex], orbPalette, 16);
   }
 
-  function drawLeaf(x, y, size, alpha) {
-    if (!leafTexture.complete || !leafTexture.naturalWidth) return;
-    const drawSize = Math.max(12, Math.round(size));
-    const left = Math.round(x - drawSize / 2);
-    const top = Math.round(y - drawSize / 2);
+  function drawLeaf(x, y, size, alpha, angle, variant) {
+    const tex = leafTextures[variant] || leafTextures[0];
+    if (!tex || !tex.complete || !tex.naturalWidth) return;
+    const drawSize = Math.max(9, Math.round(size));
     ctx.globalAlpha = alpha;
-    ctx.drawImage(leafTexture, left, top, drawSize, drawSize);
+    ctx.save();
+    ctx.translate(Math.round(x), Math.round(y));
+    ctx.rotate(angle);
+    ctx.drawImage(tex, Math.round(-drawSize / 2), Math.round(-drawSize / 2), drawSize, drawSize);
+    ctx.restore();
     ctx.globalAlpha = 1;
   }
 
@@ -224,13 +233,14 @@
       const l = leaves[i];
       l.x += l.vx + Math.sin(t * l.swing + l.phase) * 0.22;
       l.y += l.vy;
+      l.angle += l.spin;
 
       if (l.y > canvas.height + 26 || l.x < -26 || l.x > canvas.width + 26) {
         leaves.splice(i, 1);
         continue;
       }
 
-      drawLeaf(l.x, l.y, l.size, l.alpha);
+      drawLeaf(l.x, l.y, l.size, l.alpha, l.angle, l.variant);
     }
 
     orbs.forEach((p) => {
