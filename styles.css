@@ -32,8 +32,6 @@
   --home-grad-3: rgba(152, 184, 212, 0.2);
   --home-grad-4a: rgba(185, 204, 224, 0.26);
   --home-grad-4b: rgba(165, 188, 212, 0.22);
-  --cursor-pickaxe: url("/assets/diamond_pickaxe_cursor_220_visible_flipx.png?v=6") 22 3;
-  --cursor-pickaxe-active: url("/assets/diamond_pickaxe_cursor_220_visible_flipx.png?v=6") 22 3;
 }
 
 [data-theme="dark"] {
@@ -75,7 +73,7 @@ html { scroll-behavior: smooth; }
 
 html,
 body {
-  cursor: var(--cursor-pickaxe), auto;
+  cursor: auto;
 }
 
 a,
@@ -88,7 +86,7 @@ summary,
 .hero-icosa,
 .cta,
 .theme-fab {
-  cursor: var(--cursor-pickaxe-active), pointer;
+  cursor: pointer;
 }
 
 body {
@@ -213,7 +211,7 @@ body.modal-open {
   line-height: 1;
   font-weight: 600;
   letter-spacing: 0;
-  cursor: var(--cursor-pickaxe-active), pointer;
+  cursor: pointer;
   transition: border-color var(--transition), background var(--transition), color var(--transition), transform var(--transition);
 }
 
@@ -279,7 +277,7 @@ body.modal-open {
   place-items: center;
   overflow: visible;
   touch-action: none;
-  cursor: var(--cursor-pickaxe), auto;
+  cursor: auto;
   margin-top: -3.15rem;
   margin-bottom: 3rem;
 }
@@ -507,7 +505,7 @@ body.modal-open {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  cursor: var(--cursor-pickaxe-active), pointer;
+  cursor: pointer;
   transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
   box-shadow: var(--shadow-sm);
 }
@@ -762,7 +760,7 @@ a.card-link {
 }
 
 .card-link .card {
-  cursor: var(--cursor-pickaxe-active), pointer;
+  cursor: pointer;
 }
 
 .card-arrow {
@@ -896,7 +894,7 @@ footer a:hover {
   display: grid;
   place-items: center;
   font-size: 1.15rem;
-  cursor: var(--cursor-pickaxe-active), pointer;
+  cursor: pointer;
   box-shadow: var(--shadow-md);
   z-index: 1000;
   transition: border-color var(--transition), transform var(--transition), box-shadow var(--transition);
