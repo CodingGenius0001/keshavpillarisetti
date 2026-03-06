@@ -420,6 +420,27 @@
       return tex;
     };
 
+    const textureHex = (window.__ENCHANTING_TEXTURE_HEX || {});
+
+    function canvasFromHex(hex, width = 16, height = 16) {
+      if (typeof hex !== 'string' || !hex) return null;
+      const expectedLen = width * height * 8;
+      if (hex.length !== expectedLen) return null;
+      const bytes = new Uint8ClampedArray(width * height * 4);
+      for (let i = 0, j = 0; i < bytes.length; i += 1, j += 2) {
+        const v = parseInt(hex.slice(j, j + 2), 16);
+        bytes[i] = Number.isFinite(v) ? v : 0;
+      }
+      const canvasEl = document.createElement('canvas');
+      canvasEl.width = width;
+      canvasEl.height = height;
+      const cctx = canvasEl.getContext('2d');
+      if (!cctx) return null;
+      cctx.imageSmoothingEnabled = false;
+      cctx.putImageData(new ImageData(bytes, width, height), 0, 0);
+      return canvasEl;
+    }
+
     function makePixelTexture(drawer) {
       const canvasEl = document.createElement('canvas');
       canvasEl.width = 16;
@@ -431,68 +452,39 @@
       return configureTexture(new THREE.CanvasTexture(canvasEl));
     }
 
-    const topTex = makePixelTexture((cctx) => {
+    function textureFromHex(hex) {
+      const src = canvasFromHex(hex, 16, 16);
+      if (!src) return null;
+      return configureTexture(new THREE.CanvasTexture(src));
+    }
+
+    function croppedSideTextureFromHex(hex) {
+      const src = canvasFromHex(hex, 16, 16);
+      if (!src) return null;
+      const out = document.createElement('canvas');
+      out.width = 16;
+      out.height = 16;
+      const cctx = out.getContext('2d');
+      if (!cctx) return null;
+      cctx.imageSmoothingEnabled = false;
+      // Match vanilla model UV (v=4..16) by scaling the visible lower 12 rows.
+      cctx.drawImage(src, 0, 4, 16, 12, 0, 0, 16, 16);
+      return configureTexture(new THREE.CanvasTexture(out));
+    }
+
+    const topTex = textureFromHex(textureHex.top) || makePixelTexture((cctx) => {
       cctx.fillStyle = '#7a1839';
       cctx.fillRect(0, 0, 16, 16);
-      cctx.fillStyle = '#5a102a';
-      cctx.fillRect(2, 2, 12, 12);
-      cctx.fillStyle = '#2a1120';
-      cctx.fillRect(3, 3, 10, 10);
-      cctx.fillStyle = '#41d2df';
-      cctx.fillRect(1, 1, 2, 2);
-      cctx.fillRect(13, 1, 2, 2);
-      cctx.fillRect(1, 13, 2, 2);
-      cctx.fillRect(13, 13, 2, 2);
-      cctx.fillStyle = '#93f4ff';
-      cctx.fillRect(2, 2, 1, 1);
-      cctx.fillRect(13, 2, 1, 1);
-      cctx.fillRect(2, 13, 1, 1);
-      cctx.fillRect(13, 13, 1, 1);
-      cctx.fillStyle = '#b49661';
-      cctx.fillRect(5, 5, 6, 1);
-      cctx.fillRect(5, 10, 6, 1);
-      cctx.fillRect(5, 6, 1, 4);
-      cctx.fillRect(10, 6, 1, 4);
-      cctx.fillStyle = '#3e2b55';
-      cctx.fillRect(7, 7, 2, 2);
     });
 
-    const sideTex = makePixelTexture((cctx) => {
+    const sideTex = croppedSideTextureFromHex(textureHex.side) || makePixelTexture((cctx) => {
       cctx.fillStyle = '#2b1f3f';
       cctx.fillRect(0, 0, 16, 16);
-      cctx.fillStyle = '#211634';
-      cctx.fillRect(0, 0, 1, 16);
-      cctx.fillRect(15, 0, 1, 16);
-      cctx.fillStyle = '#3b2b55';
-      cctx.fillRect(1, 0, 14, 2);
-      cctx.fillStyle = '#251a39';
-      for (let y = 2; y < 16; y += 2) {
-        cctx.fillRect(1, y, 14, 1);
-      }
-      cctx.fillStyle = '#4fd7e6';
-      cctx.fillRect(6, 4, 4, 1);
-      cctx.fillRect(7, 3, 2, 1);
-      cctx.fillRect(7, 5, 2, 1);
-      cctx.fillStyle = '#9bf8ff';
-      cctx.fillRect(7, 4, 2, 1);
-      cctx.fillStyle = '#c5a86a';
-      cctx.fillRect(4, 10, 8, 1);
-      cctx.fillRect(7, 7, 2, 4);
     });
 
-    const bottomTex = makePixelTexture((cctx) => {
+    const bottomTex = textureFromHex(textureHex.bottom) || makePixelTexture((cctx) => {
       cctx.fillStyle = '#171222';
       cctx.fillRect(0, 0, 16, 16);
-      cctx.fillStyle = '#20172f';
-      for (let y = 0; y < 16; y += 2) {
-        for (let x = (y % 4 === 0 ? 0 : 1); x < 16; x += 2) {
-          cctx.fillRect(x, y, 1, 1);
-        }
-      }
-      cctx.fillStyle = '#2a1e3c';
-      cctx.fillRect(4, 4, 8, 8);
-      cctx.fillStyle = '#111';
-      cctx.fillRect(5, 5, 6, 6);
     });
 
     const topEdgeTex = makePixelTexture((cctx) => {
@@ -505,7 +497,7 @@
     });
 
     const tableBase = new THREE.Mesh(
-      new THREE.BoxGeometry(1.72, 0.66, 1.72),
+      new THREE.BoxGeometry(1.72, 1.08, 1.72),
       [
         new THREE.MeshBasicMaterial({ map: sideTex }),
         new THREE.MeshBasicMaterial({ map: sideTex }),
@@ -515,11 +507,11 @@
         new THREE.MeshBasicMaterial({ map: sideTex })
       ]
     );
-    tableBase.position.y = -0.33;
+    tableBase.position.y = -0.24;
     world.add(tableBase);
 
     const tableTop = new THREE.Mesh(
-      new THREE.BoxGeometry(1.72, 0.18, 1.72),
+      new THREE.BoxGeometry(1.72, 0.21, 1.72),
       [
         new THREE.MeshBasicMaterial({ map: topEdgeTex }),
         new THREE.MeshBasicMaterial({ map: topEdgeTex }),
@@ -529,11 +521,11 @@
         new THREE.MeshBasicMaterial({ map: topEdgeTex })
       ]
     );
-    tableTop.position.y = 0.09;
+    tableTop.position.y = 0.405;
     world.add(tableTop);
 
     const bookHover = new THREE.Group();
-    bookHover.position.set(0, 0.58, 0);
+    bookHover.position.set(0, 0.9, 0);
     world.add(bookHover);
 
     const bookYaw = new THREE.Group();
@@ -690,7 +682,7 @@
       smoothBookPointer.x += (targetLookX - smoothBookPointer.x) * lookEase;
       smoothBookPointer.y += (targetLookY - smoothBookPointer.y) * lookEase;
 
-      bookHover.position.y = 0.58 + Math.sin(t * 2.1) * 0.045;
+      bookHover.position.y = 0.9 + Math.sin(t * 2.1) * 0.045;
       const targetBookYaw = smoothBookPointer.x * 1.02;
       const targetBookPitch = 0.23 - smoothBookPointer.y * 0.34 + Math.sin(t * 1.8) * 0.02;
       bookYaw.rotation.y += (targetBookYaw - bookYaw.rotation.y) * 0.12;
