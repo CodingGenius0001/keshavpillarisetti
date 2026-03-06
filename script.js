@@ -347,11 +347,6 @@
   if (!ico) return;
 
   const THREE_URL = 'https://unpkg.com/three@0.160.0/build/three.min.js';
-  const TEX = {
-    top: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAAHlBMVEX////D+/Gi9udK7dEszbGiKSl0HTJ/ByhYFixrAC8DkiHoAAAATElEQVR42mNgFJkJBI4CDELKpaGh4UaKCIazeWhYamixCcP00rCOjtTwSoapoRkdHW2hkUBGBxCAGGEgRiqcgZCCK4ZrRxiIaRfMGQCJpTAVX3ynKQAAAABJRU5ErkJggg==',
-    side: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAAKlBMVEUAAAD////D+/Gi9udK7dEszbGiKSk7J1R/ByhrAC8nHj0QDBwGAwsAAAHmTmT4AAAAAXRSTlMAQObYZgAAAHpJREFUeNpjYoACJjwMIdWZQBCkyCTI///s2Q8fBYFSjgwMIkApQ3EWA2aHQmGmzvx7zsb3vpcxnVNmvKigoCDIJPhBQFGA6SMfk/z/jwy/5/5/yPRmvdyHB05/GJkeO35UEBEQ+8BkIPDhosBHBgOmR/wKfJ/4/38AAKCdJ29jwsr7AAAAAElFTkSuQmCC',
-    bottom: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAAD1BMVEU7J1QnHj0QDBwGAwsAAAFbDTSxAAAAaUlEQVR42gVAARGAMAj8mUA3AzhYAOUJoED/TB68Ut/xNLiFb9wVhfPpaybePs3KHJ+sqmRCVpCNBbG9+ekJvySq3hPVZI7qgl56aBihTmPph+Cyu4ng3kJ2vRSHMoQ+8FGHLU9o5FwkfyEoFb7iY82bAAAAAElFTkSuQmCC'
-  };
 
   const loadScript = (src, readyCheck, onReady, onError) => {
     if (readyCheck()) return onReady();
@@ -413,17 +408,6 @@
     const pageEdge = new THREE.MeshLambertMaterial({ color: 0xd9cc9f });
     const bookCover = new THREE.MeshLambertMaterial({ color: 0x7a203a });
     const bookSpine = new THREE.MeshLambertMaterial({ color: 0x4f1222 });
-    const fallbackSide = new THREE.MeshLambertMaterial({ color: 0x3f274f });
-    const fallbackTop = new THREE.MeshLambertMaterial({ color: 0x8a1a4a });
-    const fallbackBottom = new THREE.MeshLambertMaterial({ color: 0x1b1427 });
-
-    const tableGeo = new THREE.BoxGeometry(1.72, 0.84, 1.72);
-    const tablePlaceholder = new THREE.Mesh(
-      tableGeo,
-      [fallbackSide, fallbackSide, fallbackTop, fallbackBottom, fallbackSide, fallbackSide]
-    );
-    tablePlaceholder.position.y = -0.24;
-    world.add(tablePlaceholder);
 
     const configureTexture = (tex) => {
       tex.magFilter = THREE.NearestFilter;
@@ -436,49 +420,120 @@
       return tex;
     };
 
-    const loadImage = (src) => new Promise((resolve, reject) => {
-      const img = new Image();
-      img.onload = () => resolve(img);
-      img.onerror = () => reject(new Error('image-load-failed'));
-      img.src = src;
-    });
-
-    function makeTextureFromImage(img, options = {}) {
-      if (!options.cropSide) {
-        return configureTexture(new THREE.CanvasTexture(img));
-      }
+    function makePixelTexture(drawer) {
       const canvasEl = document.createElement('canvas');
       canvasEl.width = 16;
       canvasEl.height = 16;
       const cctx = canvasEl.getContext('2d');
-      if (!cctx) return configureTexture(new THREE.CanvasTexture(img));
+      if (!cctx) return configureTexture(new THREE.CanvasTexture(canvasEl));
       cctx.imageSmoothingEnabled = false;
-      // Side texture has 4 transparent rows at top; crop to visible 12 rows.
-      cctx.drawImage(img, 0, 4, 16, 12, 0, 0, 16, 16);
+      drawer(cctx);
       return configureTexture(new THREE.CanvasTexture(canvasEl));
     }
 
-    Promise.all([loadImage(TEX.top), loadImage(TEX.side), loadImage(TEX.bottom)])
-      .then(([topImg, sideImg, bottomImg]) => {
-        const topTex = makeTextureFromImage(topImg);
-        const sideTex = makeTextureFromImage(sideImg, { cropSide: true });
-        const bottomTex = makeTextureFromImage(bottomImg);
-        const texturedMaterials = [
-          new THREE.MeshLambertMaterial({ map: sideTex, color: 0xffffff }),
-          new THREE.MeshLambertMaterial({ map: sideTex, color: 0xffffff }),
-          new THREE.MeshLambertMaterial({ map: topTex, color: 0xffffff }),
-          new THREE.MeshLambertMaterial({ map: bottomTex, color: 0xffffff }),
-          new THREE.MeshLambertMaterial({ map: sideTex, color: 0xffffff }),
-          new THREE.MeshLambertMaterial({ map: sideTex, color: 0xffffff })
-        ];
-        tablePlaceholder.material = texturedMaterials;
-      })
-      .catch(() => {
-        // Keep fallback material if image decode fails.
-      });
+    const topTex = makePixelTexture((cctx) => {
+      cctx.fillStyle = '#7a1839';
+      cctx.fillRect(0, 0, 16, 16);
+      cctx.fillStyle = '#5a102a';
+      cctx.fillRect(2, 2, 12, 12);
+      cctx.fillStyle = '#2a1120';
+      cctx.fillRect(3, 3, 10, 10);
+      cctx.fillStyle = '#41d2df';
+      cctx.fillRect(1, 1, 2, 2);
+      cctx.fillRect(13, 1, 2, 2);
+      cctx.fillRect(1, 13, 2, 2);
+      cctx.fillRect(13, 13, 2, 2);
+      cctx.fillStyle = '#93f4ff';
+      cctx.fillRect(2, 2, 1, 1);
+      cctx.fillRect(13, 2, 1, 1);
+      cctx.fillRect(2, 13, 1, 1);
+      cctx.fillRect(13, 13, 1, 1);
+      cctx.fillStyle = '#b49661';
+      cctx.fillRect(5, 5, 6, 1);
+      cctx.fillRect(5, 10, 6, 1);
+      cctx.fillRect(5, 6, 1, 4);
+      cctx.fillRect(10, 6, 1, 4);
+      cctx.fillStyle = '#3e2b55';
+      cctx.fillRect(7, 7, 2, 2);
+    });
+
+    const sideTex = makePixelTexture((cctx) => {
+      cctx.fillStyle = '#2b1f3f';
+      cctx.fillRect(0, 0, 16, 16);
+      cctx.fillStyle = '#211634';
+      cctx.fillRect(0, 0, 1, 16);
+      cctx.fillRect(15, 0, 1, 16);
+      cctx.fillStyle = '#3b2b55';
+      cctx.fillRect(1, 0, 14, 2);
+      cctx.fillStyle = '#251a39';
+      for (let y = 2; y < 16; y += 2) {
+        cctx.fillRect(1, y, 14, 1);
+      }
+      cctx.fillStyle = '#4fd7e6';
+      cctx.fillRect(6, 4, 4, 1);
+      cctx.fillRect(7, 3, 2, 1);
+      cctx.fillRect(7, 5, 2, 1);
+      cctx.fillStyle = '#9bf8ff';
+      cctx.fillRect(7, 4, 2, 1);
+      cctx.fillStyle = '#c5a86a';
+      cctx.fillRect(4, 10, 8, 1);
+      cctx.fillRect(7, 7, 2, 4);
+    });
+
+    const bottomTex = makePixelTexture((cctx) => {
+      cctx.fillStyle = '#171222';
+      cctx.fillRect(0, 0, 16, 16);
+      cctx.fillStyle = '#20172f';
+      for (let y = 0; y < 16; y += 2) {
+        for (let x = (y % 4 === 0 ? 0 : 1); x < 16; x += 2) {
+          cctx.fillRect(x, y, 1, 1);
+        }
+      }
+      cctx.fillStyle = '#2a1e3c';
+      cctx.fillRect(4, 4, 8, 8);
+      cctx.fillStyle = '#111';
+      cctx.fillRect(5, 5, 6, 6);
+    });
+
+    const topEdgeTex = makePixelTexture((cctx) => {
+      cctx.fillStyle = '#6f1533';
+      cctx.fillRect(0, 0, 16, 16);
+      cctx.fillStyle = '#4f0f24';
+      cctx.fillRect(0, 13, 16, 3);
+      cctx.fillStyle = '#2b1020';
+      cctx.fillRect(0, 15, 16, 1);
+    });
+
+    const tableBase = new THREE.Mesh(
+      new THREE.BoxGeometry(1.72, 0.66, 1.72),
+      [
+        new THREE.MeshBasicMaterial({ map: sideTex }),
+        new THREE.MeshBasicMaterial({ map: sideTex }),
+        new THREE.MeshBasicMaterial({ map: topEdgeTex }),
+        new THREE.MeshBasicMaterial({ map: bottomTex }),
+        new THREE.MeshBasicMaterial({ map: sideTex }),
+        new THREE.MeshBasicMaterial({ map: sideTex })
+      ]
+    );
+    tableBase.position.y = -0.33;
+    world.add(tableBase);
+
+    const tableTop = new THREE.Mesh(
+      new THREE.BoxGeometry(1.72, 0.18, 1.72),
+      [
+        new THREE.MeshBasicMaterial({ map: topEdgeTex }),
+        new THREE.MeshBasicMaterial({ map: topEdgeTex }),
+        new THREE.MeshBasicMaterial({ map: topTex }),
+        new THREE.MeshBasicMaterial({ map: topEdgeTex }),
+        new THREE.MeshBasicMaterial({ map: topEdgeTex }),
+        new THREE.MeshBasicMaterial({ map: topEdgeTex })
+      ]
+    );
+    tableTop.position.y = 0.09;
+    world.add(tableTop);
 
     const bookHover = new THREE.Group();
-    bookHover.position.set(0, 0.66, 0);
+    bookHover.position.set(0, 0.58, 0);
     world.add(bookHover);
 
     const bookYaw = new THREE.Group();
@@ -635,7 +690,7 @@
       smoothBookPointer.x += (targetLookX - smoothBookPointer.x) * lookEase;
       smoothBookPointer.y += (targetLookY - smoothBookPointer.y) * lookEase;
 
-      bookHover.position.y = 0.66 + Math.sin(t * 2.1) * 0.045;
+      bookHover.position.y = 0.58 + Math.sin(t * 2.1) * 0.045;
       const targetBookYaw = smoothBookPointer.x * 1.02;
       const targetBookPitch = 0.23 - smoothBookPointer.y * 0.34 + Math.sin(t * 1.8) * 0.02;
       bookYaw.rotation.y += (targetBookYaw - bookYaw.rotation.y) * 0.12;
