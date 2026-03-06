@@ -328,11 +328,11 @@ body.modal-open {
 }
 
 .text-glass {
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  background: rgba(10, 16, 24, 0.42);
-  backdrop-filter: blur(7px) saturate(120%);
-  -webkit-backdrop-filter: blur(7px) saturate(120%);
-  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.24);
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  box-shadow: var(--shadow-sm);
 }
 
 .text-glass-eyebrow {
