@@ -380,8 +380,8 @@
     const drawHeight = Math.round(height * overscan);
 
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(40, drawWidth / drawHeight, 0.1, 100);
-    camera.position.set(2.3, 2.15, 3.05);
+    const camera = new THREE.PerspectiveCamera(36, drawWidth / drawHeight, 0.1, 100);
+    camera.position.set(2.52, 1.66, 2.82);
     camera.lookAt(0, 0, 0);
 
     const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
@@ -497,7 +497,7 @@
     });
 
     const tableBase = new THREE.Mesh(
-      new THREE.BoxGeometry(1.72, 1.08, 1.72),
+      new THREE.BoxGeometry(1.72, 0.52, 1.72),
       [
         new THREE.MeshBasicMaterial({ map: sideTex }),
         new THREE.MeshBasicMaterial({ map: sideTex }),
@@ -507,11 +507,11 @@
         new THREE.MeshBasicMaterial({ map: sideTex })
       ]
     );
-    tableBase.position.y = -0.24;
+    tableBase.position.y = -0.32;
     world.add(tableBase);
 
     const tableTop = new THREE.Mesh(
-      new THREE.BoxGeometry(1.72, 0.21, 1.72),
+      new THREE.BoxGeometry(1.72, 0.18, 1.72),
       [
         new THREE.MeshBasicMaterial({ map: topEdgeTex }),
         new THREE.MeshBasicMaterial({ map: topEdgeTex }),
@@ -521,11 +521,11 @@
         new THREE.MeshBasicMaterial({ map: topEdgeTex })
       ]
     );
-    tableTop.position.y = 0.405;
+    tableTop.position.y = 0.03;
     world.add(tableTop);
 
     const bookHover = new THREE.Group();
-    bookHover.position.set(0, 0.9, 0);
+    bookHover.position.set(0, 0.55, 0);
     world.add(bookHover);
 
     const bookYaw = new THREE.Group();
@@ -533,45 +533,45 @@
 
     const bookTilt = new THREE.Group();
     bookYaw.add(bookTilt);
-    bookTilt.rotation.x = 0.22;
+    bookTilt.rotation.x = 0.4;
 
-    const pages = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.11, 0.44), page);
-    pages.position.y = 0.01;
+    const pages = new THREE.Mesh(new THREE.BoxGeometry(0.68, 0.09, 0.5), page);
+    pages.position.y = 0.015;
     bookTilt.add(pages);
 
-    const pageBand = new THREE.Mesh(new THREE.BoxGeometry(0.58, 0.014, 0.41), pageEdge);
-    pageBand.position.y = 0.067;
+    const pageBand = new THREE.Mesh(new THREE.BoxGeometry(0.64, 0.012, 0.46), pageEdge);
+    pageBand.position.y = 0.06;
     bookTilt.add(pageBand);
 
-    const spine = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.15, 0.47), bookSpine);
-    spine.position.y = 0.005;
+    const spine = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.14, 0.52), bookSpine);
+    spine.position.y = 0.01;
     bookTilt.add(spine);
 
     const leftCoverPivot = new THREE.Group();
-    leftCoverPivot.position.set(-0.045, 0.01, 0);
+    leftCoverPivot.position.set(-0.05, 0.012, 0);
     bookTilt.add(leftCoverPivot);
-    const leftCover = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.04, 0.47), bookCover);
-    leftCover.position.x = -0.17;
+    const leftCover = new THREE.Mesh(new THREE.BoxGeometry(0.39, 0.04, 0.52), bookCover);
+    leftCover.position.x = -0.2;
     leftCoverPivot.add(leftCover);
 
     const rightCoverPivot = new THREE.Group();
-    rightCoverPivot.position.set(0.045, 0.01, 0);
+    rightCoverPivot.position.set(0.05, 0.012, 0);
     bookTilt.add(rightCoverPivot);
-    const rightCover = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.04, 0.47), bookCover);
-    rightCover.position.x = 0.17;
+    const rightCover = new THREE.Mesh(new THREE.BoxGeometry(0.39, 0.04, 0.52), bookCover);
+    rightCover.position.x = 0.2;
     rightCoverPivot.add(rightCover);
 
-    const leftPage = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.022, 0.4), pageEdge);
-    leftPage.position.set(-0.14, 0.03, 0);
+    const leftPage = new THREE.Mesh(new THREE.BoxGeometry(0.27, 0.02, 0.45), pageEdge);
+    leftPage.position.set(-0.16, 0.03, 0);
     leftCoverPivot.add(leftPage);
 
-    const rightPage = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.022, 0.4), pageEdge);
-    rightPage.position.set(0.14, 0.03, 0);
+    const rightPage = new THREE.Mesh(new THREE.BoxGeometry(0.27, 0.02, 0.45), pageEdge);
+    rightPage.position.set(0.16, 0.03, 0);
     rightCoverPivot.add(rightPage);
 
-    let yaw = Math.PI / 4;
+    let yaw = 0.08;
     let lastTick = performance.now();
-    const spinSpeed = isCoarse ? 0.0028 : 0.0036;
+    const spinSpeed = isCoarse ? 0.0024 : 0.003;
     const dragYawScale = isCoarse ? 0.0135 : 0.0115;
     const dragPitchScale = isCoarse ? 0.0105 : 0.0088;
     const clampPitch = (n) => Math.max(-1.45, Math.min(1.45, n));
@@ -682,18 +682,18 @@
       smoothBookPointer.x += (targetLookX - smoothBookPointer.x) * lookEase;
       smoothBookPointer.y += (targetLookY - smoothBookPointer.y) * lookEase;
 
-      bookHover.position.y = 0.9 + Math.sin(t * 2.1) * 0.045;
-      const targetBookYaw = smoothBookPointer.x * 1.02;
-      const targetBookPitch = 0.23 - smoothBookPointer.y * 0.34 + Math.sin(t * 1.8) * 0.02;
-      bookYaw.rotation.y += (targetBookYaw - bookYaw.rotation.y) * 0.12;
-      bookTilt.rotation.x += (targetBookPitch - bookTilt.rotation.x) * 0.1;
+      bookHover.position.y = 0.55 + Math.sin(t * 2.15) * 0.038;
+      const targetBookYaw = smoothBookPointer.x * 1.28 + Math.sin(t * 0.62) * 0.04;
+      const targetBookPitch = 0.4 - smoothBookPointer.y * 0.42 + Math.sin(t * 1.65) * 0.025;
+      bookYaw.rotation.y += (targetBookYaw - bookYaw.rotation.y) * 0.14;
+      bookTilt.rotation.x += (targetBookPitch - bookTilt.rotation.x) * 0.12;
 
-      const openAngle = 0.84 + Math.sin(t * 1.55) * 0.08 + Math.min(0.18, Math.abs(smoothBookPointer.x) * 0.28);
-      const pageSkew = smoothBookPointer.x * 0.22;
-      leftCoverPivot.rotation.y += (openAngle - leftCoverPivot.rotation.y) * 0.13;
-      rightCoverPivot.rotation.y += (-openAngle - rightCoverPivot.rotation.y) * 0.13;
-      leftPage.rotation.y += ((openAngle * 0.55 + pageSkew) - leftPage.rotation.y) * 0.11;
-      rightPage.rotation.y += ((-openAngle * 0.55 + pageSkew) - rightPage.rotation.y) * 0.11;
+      const openAngle = 1.02 + Math.sin(t * 1.55) * 0.09 + Math.min(0.22, Math.abs(smoothBookPointer.x) * 0.34);
+      const pageSkew = smoothBookPointer.x * 0.28;
+      leftCoverPivot.rotation.y += (openAngle - leftCoverPivot.rotation.y) * 0.16;
+      rightCoverPivot.rotation.y += (-openAngle - rightCoverPivot.rotation.y) * 0.16;
+      leftPage.rotation.y += ((openAngle * 0.62 + pageSkew) - leftPage.rotation.y) * 0.14;
+      rightPage.rotation.y += ((-openAngle * 0.62 + pageSkew) - rightPage.rotation.y) * 0.14;
 
       renderer.render(scene, camera);
     }
