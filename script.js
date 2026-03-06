@@ -138,6 +138,7 @@
     img.src = `/src/cherry_${i}.png`;
     return img;
   });
+  const LEAF_TINT = 'rgba(172, 232, 156, 0.82)';
 
   function resize() {
     canvas.width = window.innerWidth;
@@ -211,11 +212,17 @@
     const tex = leafTextures[variant] || leafTextures[0];
     if (!tex || !tex.complete || !tex.naturalWidth) return;
     const drawSize = Math.max(9, Math.round(size));
-    ctx.globalAlpha = alpha;
     ctx.save();
     ctx.translate(Math.round(x), Math.round(y));
     ctx.rotate(angle);
-    ctx.drawImage(tex, Math.round(-drawSize / 2), Math.round(-drawSize / 2), drawSize, drawSize);
+    ctx.globalAlpha = alpha;
+    const left = Math.round(-drawSize / 2);
+    const top = Math.round(-drawSize / 2);
+    ctx.drawImage(tex, left, top, drawSize, drawSize);
+    ctx.globalCompositeOperation = 'source-atop';
+    ctx.fillStyle = LEAF_TINT;
+    ctx.fillRect(left, top, drawSize, drawSize);
+    ctx.globalCompositeOperation = 'source-over';
     ctx.restore();
     ctx.globalAlpha = 1;
   }
