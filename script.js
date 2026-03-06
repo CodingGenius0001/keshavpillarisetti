@@ -113,7 +113,7 @@
   const getMotionProfile = () => {
     const mobile = window.innerWidth <= 768;
     return {
-      orbCount: mobile ? 18 : 25,
+      orbCount: 0,
       leafMax: mobile ? 12 : 24,
       leafSpawnChance: mobile ? 0.0045 : 0.008,
       orbDrift: mobile ? 0.72 : 0.9
