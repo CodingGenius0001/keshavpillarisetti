@@ -347,6 +347,11 @@
   if (!ico) return;
 
   const THREE_URL = 'https://unpkg.com/three@0.160.0/build/three.min.js';
+  const TEX = {
+    top: '/src/enchanting_table_top.png',
+    side: '/src/enchanting_table_side.png',
+    bottom: '/src/enchanting_table_bottom.png'
+  };
 
   const loadScript = (src, readyCheck, onReady, onError) => {
     if (readyCheck()) return onReady();
@@ -404,65 +409,58 @@
     const world = new THREE.Group();
     scene.add(world);
 
-    const obsidianDark = new THREE.MeshLambertMaterial({ color: 0x151225 });
-    const obsidianFace = new THREE.MeshLambertMaterial({ color: 0x201a35 });
-    const carpet = new THREE.MeshLambertMaterial({ color: 0x7b1737 });
-    const runeInlay = new THREE.MeshLambertMaterial({
-      color: 0x251438,
-      emissive: 0x4f1d78,
-      emissiveIntensity: 0.42
-    });
-    const gem = new THREE.MeshLambertMaterial({
-      color: 0x2a8add,
-      emissive: 0x1b4f9d,
-      emissiveIntensity: 0.58
-    });
     const page = new THREE.MeshLambertMaterial({ color: 0xe6ddb9 });
-    const pageEdge = new THREE.MeshLambertMaterial({ color: 0xcfc49c });
-    const bookCover = new THREE.MeshLambertMaterial({ color: 0x742238 });
+    const pageEdge = new THREE.MeshLambertMaterial({ color: 0xd9cc9f });
+    const bookCover = new THREE.MeshLambertMaterial({ color: 0x7a203a });
     const bookSpine = new THREE.MeshLambertMaterial({ color: 0x4f1222 });
+    const fallbackSide = new THREE.MeshLambertMaterial({ color: 0x2a1f3e });
+    const fallbackTop = new THREE.MeshLambertMaterial({ color: 0x6b1738 });
+    const fallbackBottom = new THREE.MeshLambertMaterial({ color: 0x15131e });
 
-    const tableBase = new THREE.Mesh(
-      new THREE.BoxGeometry(1.78, 0.78, 1.78),
-      [obsidianFace, obsidianFace, obsidianDark, obsidianDark, obsidianFace, obsidianFace]
+    let tableBase = new THREE.Mesh(
+      new THREE.BoxGeometry(1.72, 1.08, 1.72),
+      [fallbackSide, fallbackSide, fallbackTop, fallbackBottom, fallbackSide, fallbackSide]
     );
-    tableBase.position.y = -0.24;
+    tableBase.position.y = -0.08;
     world.add(tableBase);
 
-    const carpetTop = new THREE.Mesh(new THREE.BoxGeometry(1.72, 0.17, 1.72), carpet);
-    carpetTop.position.y = 0.24;
-    world.add(carpetTop);
-
-    const inlayTop = new THREE.Mesh(new THREE.BoxGeometry(0.96, 0.07, 0.96), runeInlay);
-    inlayTop.position.y = 0.36;
-    world.add(inlayTop);
-
-    const ringThickness = 0.06;
-    const ringHeight = 0.08;
-    const ringMat = new THREE.MeshLambertMaterial({ color: 0x3f2148, emissive: 0x5e2c78, emissiveIntensity: 0.33 });
-    const ringPieces = [
-      [0, 0.38, 0.49, 0.98, ringHeight, ringThickness],
-      [0, 0.38, -0.49, 0.98, ringHeight, ringThickness],
-      [0.49, 0.38, 0, ringThickness, ringHeight, 0.98],
-      [-0.49, 0.38, 0, ringThickness, ringHeight, 0.98]
-    ];
-    ringPieces.forEach(([x, y, z, w, h, d]) => {
-      const piece = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), ringMat);
-      piece.position.set(x, y, z);
-      world.add(piece);
+    const loader = new THREE.TextureLoader();
+    const configureTexture = (tex) => {
+      tex.magFilter = THREE.NearestFilter;
+      tex.minFilter = THREE.NearestFilter;
+      tex.generateMipmaps = false;
+      tex.colorSpace = THREE.SRGBColorSpace;
+      tex.wrapS = THREE.ClampToEdgeWrapping;
+      tex.wrapT = THREE.ClampToEdgeWrapping;
+      tex.needsUpdate = true;
+      return tex;
+    };
+    const loadTexture = (url) => new Promise((resolve, reject) => {
+      loader.load(url, (tex) => resolve(configureTexture(tex)), undefined, () => reject(new Error(url)));
     });
 
-    const cornerPos = 0.68;
-    [-cornerPos, cornerPos].forEach((x) => {
-      [-cornerPos, cornerPos].forEach((z) => {
-        const bead = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.16, 0.16), gem);
-        bead.position.set(x, 0.33, z);
-        world.add(bead);
+    Promise.all([loadTexture(TEX.top), loadTexture(TEX.side), loadTexture(TEX.bottom)])
+      .then(([topTex, sideTex, bottomTex]) => {
+        world.remove(tableBase);
+        tableBase.geometry.dispose();
+        const texturedMaterials = [
+          new THREE.MeshLambertMaterial({ map: sideTex, color: 0xffffff }),
+          new THREE.MeshLambertMaterial({ map: sideTex, color: 0xffffff }),
+          new THREE.MeshLambertMaterial({ map: topTex, color: 0xffffff }),
+          new THREE.MeshLambertMaterial({ map: bottomTex, color: 0xffffff }),
+          new THREE.MeshLambertMaterial({ map: sideTex, color: 0xffffff }),
+          new THREE.MeshLambertMaterial({ map: sideTex, color: 0xffffff })
+        ];
+        tableBase = new THREE.Mesh(new THREE.BoxGeometry(1.72, 1.08, 1.72), texturedMaterials);
+        tableBase.position.y = -0.08;
+        world.add(tableBase);
+      })
+      .catch(() => {
+        // Keep fallback table material if textures fail to load.
       });
-    });
 
     const bookHover = new THREE.Group();
-    bookHover.position.set(0, 0.86, 0);
+    bookHover.position.set(0, 0.74, 0);
     world.add(bookHover);
 
     const bookYaw = new THREE.Group();
@@ -619,7 +617,7 @@
       smoothBookPointer.x += (targetLookX - smoothBookPointer.x) * lookEase;
       smoothBookPointer.y += (targetLookY - smoothBookPointer.y) * lookEase;
 
-      bookHover.position.y = 0.86 + Math.sin(t * 2.1) * 0.045;
+      bookHover.position.y = 0.74 + Math.sin(t * 2.1) * 0.045;
       const targetBookYaw = smoothBookPointer.x * 1.02;
       const targetBookPitch = 0.23 - smoothBookPointer.y * 0.34 + Math.sin(t * 1.8) * 0.02;
       bookYaw.rotation.y += (targetBookYaw - bookYaw.rotation.y) * 0.12;
