@@ -38,9 +38,9 @@
   --bg: #080f1e;
   --bg-alt: #0d1a30;
   --surface: #0d1a30;
-  --text: #e4eeff;
-  --text-secondary: #a0b8d8;
-  --muted: #5a7a9e;
+  --text: #ffffff;
+  --text-secondary: #d0e4ff;
+  --muted: #7a9cbf;
   --primary: #4a9eff;
   --primary-light: #6eb5ff;
   --primary-subtle: rgba(74, 158, 255, 0.12);
@@ -51,7 +51,7 @@
   --shadow-md: 0 4px 16px rgba(0, 10, 40, 0.3);
   --shadow-lg: 0 8px 32px rgba(0, 10, 40, 0.4);
   --home-bg: #0e1828;
-  --home-text: #dceeff;
+  --home-text: #ffffff;
   --home-nav: rgba(200, 225, 255, 0.84);
   --home-nav-hover-text: #ffffff;
   --home-nav-hover-bg: rgba(74, 158, 255, 0.14);
