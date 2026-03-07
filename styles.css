@@ -215,9 +215,11 @@ body.inner-page {
   height: 38px;
   padding: 0;
   border-radius: 10px;
-  border: 1px solid var(--home-nav-border);
-  background: rgba(255, 255, 255, 0.06);
-  color: var(--home-nav);
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  color: var(--text);
   font-size: 1.08rem;
   line-height: 1;
   font-weight: 600;
