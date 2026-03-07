@@ -1163,13 +1163,10 @@ footer a:hover {
     left: auto;
     min-width: 0;
     padding: 0;
-    border-radius: 12px;
-    border: 1px solid var(--border);
-    background: rgba(30, 35, 42, 0.92);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-    padding: 0.5rem;
+    border-radius: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
     display: flex;
     flex-direction: column;
     align-items: flex-end;
@@ -1190,11 +1187,18 @@ footer a:hover {
   .nav-links a {
     display: flex;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: center;
     width: auto;
-    padding: 0.42rem 0.76rem;
-    min-height: 38px;
-    font-size: 0.84rem;
+    padding: 0.52rem 1.1rem;
+    min-height: 40px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--border);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    border-radius: 10px;
+    color: var(--text);
   }
 
   .hero-full {
