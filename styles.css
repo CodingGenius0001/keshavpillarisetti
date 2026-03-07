@@ -35,9 +35,9 @@
 }
 
 [data-theme="dark"] {
-  --bg: #1a2744;
-  --bg-alt: #1e2f52;
-  --surface: #1e2f52;
+  --bg: #1a3a6e;
+  --bg-alt: #1e4280;
+  --surface: #1e4280;
   --text: #ffffff;
   --text-secondary: #d0e4ff;
   --muted: #7a9cbf;
@@ -50,7 +50,7 @@
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
   --shadow-md: 0 4px 16px rgba(0, 10, 40, 0.3);
   --shadow-lg: 0 8px 32px rgba(0, 10, 40, 0.4);
-  --home-bg: #1a2744;
+  --home-bg: #1a3a6e;
   --home-text: #ffffff;
   --home-nav: rgba(200, 225, 255, 0.84);
   --home-nav-hover-text: #ffffff;
