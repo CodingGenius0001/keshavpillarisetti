@@ -328,7 +328,7 @@ body.modal-open {
 
 .eyebrow {
   text-transform: none;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.2em;
   font-size: 0.75rem;
   color: var(--muted);
 }
