@@ -279,7 +279,7 @@ body.modal-open {
   touch-action: none;
   cursor: auto;
   margin-top: -3.15rem;
-  margin-bottom: 3rem;
+  margin-bottom: 11rem;
 }
 
 .hero-icosa canvas {
@@ -292,6 +292,14 @@ body.modal-open {
   image-rendering: pixelated;
   image-rendering: crisp-edges;
   filter: drop-shadow(0 16px 18px rgba(0, 0, 0, 0.35));
+  pointer-events: none;
+}
+
+.hero-icosa img {
+  display: block;
+  width: 120%;
+  height: auto;
+  filter: drop-shadow(0 12px 14px rgba(0, 0, 0, 0.35));
   pointer-events: none;
 }
 

@@ -113,7 +113,7 @@
   const getMotionProfile = () => {
     const mobile = window.innerWidth <= 768;
     return {
-      orbCount: 0,
+      orbCount: mobile ? 5 : 10,
       leafMax: mobile ? 12 : 24,
       leafSpawnChance: mobile ? 0.0045 : 0.008,
       orbDrift: mobile ? 0.72 : 0.9
@@ -171,6 +171,9 @@
     leafTextures.push(img);
     tintedLeafTextures.push(null);
   }
+
+  const orbImg = new Image();
+  orbImg.src = '/src/experienceorb.png';
 
   function resize() {
     canvas.width = window.innerWidth;
@@ -305,16 +308,16 @@
       const py = p.y + bob;
       const alpha = Math.min(1, p.alpha + boost * 0.35);
 
-      const radius = p.size * 0.65 + boost * 2.4;
-      const gradient = ctx.createRadialGradient(px, py, 0, px, py, radius * 1.8);
-      gradient.addColorStop(0, `rgba(178,255,64,${0.24 + boost * 0.2})`);
-      gradient.addColorStop(1, 'rgba(56,180,32,0)');
-      ctx.fillStyle = gradient;
-      ctx.beginPath();
-      ctx.arc(px, py, radius, 0, Math.PI * 2);
-      ctx.fill();
-
-      drawOrb(px, py, p.size, boost, alpha, t, p.frameOffset);
+      // Orb sprite — no glow, drawn bright
+      if (orbImg.complete && (orbImg.naturalWidth || orbImg.width)) {
+        const sz = Math.max(12, Math.round(p.size * 2.2 + boost * 6));
+        ctx.save();
+        ctx.globalAlpha = Math.min(1, alpha + 0.25);
+        ctx.imageSmoothingEnabled = false;
+        ctx.drawImage(orbImg, Math.round(px - sz * 0.5), Math.round(py - sz * 0.5), sz, sz);
+        ctx.restore();
+        ctx.globalAlpha = 1;
+      }
     });
 
     requestAnimationFrame(draw);
@@ -346,371 +349,13 @@
   const ico = document.getElementById('heroIcosa');
   if (!ico) return;
 
-  const THREE_URL = 'https://unpkg.com/three@0.160.0/build/three.min.js';
-
-  const loadScript = (src, readyCheck, onReady, onError) => {
-    if (readyCheck()) return onReady();
-    const s = document.createElement('script');
-    s.src = src;
-    s.async = true;
-    s.crossOrigin = 'anonymous';
-    s.onload = onReady;
-    s.onerror = onError;
-    document.head.appendChild(s);
-  };
-
-  const failVisual = () => {
-    ico.style.background = 'radial-gradient(circle at 50% 45%, rgba(123, 88, 195, 0.45), rgba(20, 21, 36, 0.08) 68%)';
-    ico.style.borderRadius = '12px';
-  };
-
-  loadScript(
-    THREE_URL,
-    () => !!window.THREE,
-    initScene,
-    failVisual
-  );
-
-  function initScene() {
-    const isCoarse = window.matchMedia('(pointer: coarse)').matches || window.innerWidth <= 768;
-    const width = ico.clientWidth || 140;
-    const height = ico.clientHeight || 140;
-    const overscan = isCoarse ? 1.5 : 1.78;
-    const drawWidth = Math.round(width * overscan);
-    const drawHeight = Math.round(height * overscan);
-
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(36, drawWidth / drawHeight, 0.1, 100);
-    camera.position.set(2.52, 1.66, 2.82);
-    camera.lookAt(0, 0, 0);
-
-    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-    renderer.setClearColor(0x000000, 0);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, isCoarse ? 1.4 : 2));
-    renderer.setSize(drawWidth, drawHeight);
-    renderer.domElement.setAttribute('aria-hidden', 'true');
-    ico.textContent = '';
-    ico.appendChild(renderer.domElement);
-
-    const ambient = new THREE.AmbientLight(0xffffff, 0.62);
-    const key = new THREE.DirectionalLight(0xf5ecff, 0.95);
-    key.position.set(2.8, 3.1, 2.3);
-    const fill = new THREE.DirectionalLight(0x90b8ff, 0.46);
-    fill.position.set(-2.2, 1.8, -1.8);
-    const rim = new THREE.DirectionalLight(0x6f48c2, 0.42);
-    rim.position.set(0, 2.8, -3.1);
-    scene.add(ambient, key, fill, rim);
-
-    const world = new THREE.Group();
-    scene.add(world);
-
-    const page = new THREE.MeshLambertMaterial({ color: 0xe6ddb9 });
-    const pageEdge = new THREE.MeshLambertMaterial({ color: 0xd9cc9f });
-    const bookCover = new THREE.MeshLambertMaterial({ color: 0x7a203a });
-    const bookSpine = new THREE.MeshLambertMaterial({ color: 0x4f1222 });
-
-    const configureTexture = (tex) => {
-      tex.magFilter = THREE.NearestFilter;
-      tex.minFilter = THREE.NearestFilter;
-      tex.generateMipmaps = false;
-      tex.colorSpace = THREE.SRGBColorSpace;
-      tex.wrapS = THREE.ClampToEdgeWrapping;
-      tex.wrapT = THREE.ClampToEdgeWrapping;
-      tex.needsUpdate = true;
-      return tex;
-    };
-
-    const textureHex = (window.__ENCHANTING_TEXTURE_HEX || {});
-
-    function canvasFromHex(hex, width = 16, height = 16) {
-      if (typeof hex !== 'string' || !hex) return null;
-      const expectedLen = width * height * 8;
-      if (hex.length !== expectedLen) return null;
-      const bytes = new Uint8ClampedArray(width * height * 4);
-      for (let i = 0, j = 0; i < bytes.length; i += 1, j += 2) {
-        const v = parseInt(hex.slice(j, j + 2), 16);
-        bytes[i] = Number.isFinite(v) ? v : 0;
-      }
-      const canvasEl = document.createElement('canvas');
-      canvasEl.width = width;
-      canvasEl.height = height;
-      const cctx = canvasEl.getContext('2d');
-      if (!cctx) return null;
-      cctx.imageSmoothingEnabled = false;
-      cctx.putImageData(new ImageData(bytes, width, height), 0, 0);
-      return canvasEl;
-    }
-
-    function makePixelTexture(drawer) {
-      const canvasEl = document.createElement('canvas');
-      canvasEl.width = 16;
-      canvasEl.height = 16;
-      const cctx = canvasEl.getContext('2d');
-      if (!cctx) return configureTexture(new THREE.CanvasTexture(canvasEl));
-      cctx.imageSmoothingEnabled = false;
-      drawer(cctx);
-      return configureTexture(new THREE.CanvasTexture(canvasEl));
-    }
-
-    function textureFromHex(hex) {
-      const src = canvasFromHex(hex, 16, 16);
-      if (!src) return null;
-      return configureTexture(new THREE.CanvasTexture(src));
-    }
-
-    function croppedSideTextureFromHex(hex) {
-      const src = canvasFromHex(hex, 16, 16);
-      if (!src) return null;
-      const out = document.createElement('canvas');
-      out.width = 16;
-      out.height = 16;
-      const cctx = out.getContext('2d');
-      if (!cctx) return null;
-      cctx.imageSmoothingEnabled = false;
-      // Match vanilla model UV (v=4..16) by scaling the visible lower 12 rows.
-      cctx.drawImage(src, 0, 4, 16, 12, 0, 0, 16, 16);
-      return configureTexture(new THREE.CanvasTexture(out));
-    }
-
-    const topTex = textureFromHex(textureHex.top) || makePixelTexture((cctx) => {
-      cctx.fillStyle = '#7a1839';
-      cctx.fillRect(0, 0, 16, 16);
-    });
-
-    const sideTex = croppedSideTextureFromHex(textureHex.side) || makePixelTexture((cctx) => {
-      cctx.fillStyle = '#2b1f3f';
-      cctx.fillRect(0, 0, 16, 16);
-    });
-
-    const bottomTex = textureFromHex(textureHex.bottom) || makePixelTexture((cctx) => {
-      cctx.fillStyle = '#171222';
-      cctx.fillRect(0, 0, 16, 16);
-    });
-
-    const topEdgeTex = makePixelTexture((cctx) => {
-      cctx.fillStyle = '#6f1533';
-      cctx.fillRect(0, 0, 16, 16);
-      cctx.fillStyle = '#4f0f24';
-      cctx.fillRect(0, 13, 16, 3);
-      cctx.fillStyle = '#2b1020';
-      cctx.fillRect(0, 15, 16, 1);
-    });
-
-    const tableBase = new THREE.Mesh(
-      new THREE.BoxGeometry(1.72, 0.52, 1.72),
-      [
-        new THREE.MeshBasicMaterial({ map: sideTex }),
-        new THREE.MeshBasicMaterial({ map: sideTex }),
-        new THREE.MeshBasicMaterial({ map: topEdgeTex }),
-        new THREE.MeshBasicMaterial({ map: bottomTex }),
-        new THREE.MeshBasicMaterial({ map: sideTex }),
-        new THREE.MeshBasicMaterial({ map: sideTex })
-      ]
-    );
-    tableBase.position.y = -0.32;
-    world.add(tableBase);
-
-    const tableTop = new THREE.Mesh(
-      new THREE.BoxGeometry(1.72, 0.18, 1.72),
-      [
-        new THREE.MeshBasicMaterial({ map: topEdgeTex }),
-        new THREE.MeshBasicMaterial({ map: topEdgeTex }),
-        new THREE.MeshBasicMaterial({ map: topTex }),
-        new THREE.MeshBasicMaterial({ map: topEdgeTex }),
-        new THREE.MeshBasicMaterial({ map: topEdgeTex }),
-        new THREE.MeshBasicMaterial({ map: topEdgeTex })
-      ]
-    );
-    tableTop.position.y = 0.03;
-    world.add(tableTop);
-
-    const bookHover = new THREE.Group();
-    bookHover.position.set(0, 0.55, 0);
-    world.add(bookHover);
-
-    const bookYaw = new THREE.Group();
-    bookHover.add(bookYaw);
-
-    const bookTilt = new THREE.Group();
-    bookYaw.add(bookTilt);
-    bookTilt.rotation.x = 0.4;
-
-    const pages = new THREE.Mesh(new THREE.BoxGeometry(0.68, 0.09, 0.5), page);
-    pages.position.y = 0.015;
-    bookTilt.add(pages);
-
-    const pageBand = new THREE.Mesh(new THREE.BoxGeometry(0.64, 0.012, 0.46), pageEdge);
-    pageBand.position.y = 0.06;
-    bookTilt.add(pageBand);
-
-    const spine = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.14, 0.52), bookSpine);
-    spine.position.y = 0.01;
-    bookTilt.add(spine);
-
-    const leftCoverPivot = new THREE.Group();
-    leftCoverPivot.position.set(-0.05, 0.012, 0);
-    bookTilt.add(leftCoverPivot);
-    const leftCover = new THREE.Mesh(new THREE.BoxGeometry(0.39, 0.04, 0.52), bookCover);
-    leftCover.position.x = -0.2;
-    leftCoverPivot.add(leftCover);
-
-    const rightCoverPivot = new THREE.Group();
-    rightCoverPivot.position.set(0.05, 0.012, 0);
-    bookTilt.add(rightCoverPivot);
-    const rightCover = new THREE.Mesh(new THREE.BoxGeometry(0.39, 0.04, 0.52), bookCover);
-    rightCover.position.x = 0.2;
-    rightCoverPivot.add(rightCover);
-
-    const leftPage = new THREE.Mesh(new THREE.BoxGeometry(0.27, 0.02, 0.45), pageEdge);
-    leftPage.position.set(-0.16, 0.03, 0);
-    leftCoverPivot.add(leftPage);
-
-    const rightPage = new THREE.Mesh(new THREE.BoxGeometry(0.27, 0.02, 0.45), pageEdge);
-    rightPage.position.set(0.16, 0.03, 0);
-    rightCoverPivot.add(rightPage);
-
-    let yaw = 0.08;
-    let lastTick = performance.now();
-    const spinSpeed = isCoarse ? 0.0024 : 0.003;
-    const dragYawScale = isCoarse ? 0.0135 : 0.0115;
-    const dragPitchScale = isCoarse ? 0.0105 : 0.0088;
-    const clampPitch = (n) => Math.max(-1.45, Math.min(1.45, n));
-    let targetYawOffset = 0;
-    let targetPitchOffset = 0;
-    let smoothYawOffset = 0;
-    let smoothPitchOffset = 0;
-    let dragPointerId = null;
-    let dragLastX = 0;
-    let dragLastY = 0;
-    const bookPointer = { x: 0, y: 0, active: false };
-    const smoothBookPointer = { x: 0, y: 0 };
-
-    function beginDrag(e) {
-      dragPointerId = e.pointerId;
-      dragLastX = e.clientX;
-      dragLastY = e.clientY;
-      if (ico.setPointerCapture) {
-        try {
-          ico.setPointerCapture(e.pointerId);
-        } catch (_) {
-          // noop
-        }
-      }
-    }
-
-    function updateDrag(e) {
-      if (dragPointerId === null || e.pointerId !== dragPointerId) return;
-      const dx = e.clientX - dragLastX;
-      const dy = e.clientY - dragLastY;
-      dragLastX = e.clientX;
-      dragLastY = e.clientY;
-      targetYawOffset += dx * dragYawScale;
-      targetPitchOffset = clampPitch(targetPitchOffset + (dy * dragPitchScale));
-    }
-
-    function resetDragOffsets() {
-      targetYawOffset = 0;
-      targetPitchOffset = 0;
-    }
-
-    function endDrag(e) {
-      if (dragPointerId === null || e.pointerId !== dragPointerId) return;
-      if (ico.hasPointerCapture && ico.hasPointerCapture(e.pointerId)) {
-        try {
-          ico.releasePointerCapture(e.pointerId);
-        } catch (_) {
-          // noop
-        }
-      }
-      dragPointerId = null;
-      resetDragOffsets();
-    }
-
-    function updateBookPointer(e) {
-      if (!window.matchMedia('(pointer: fine)').matches) return;
-      bookPointer.active = true;
-      bookPointer.x = (e.clientX / Math.max(1, window.innerWidth)) * 2 - 1;
-      bookPointer.y = (e.clientY / Math.max(1, window.innerHeight)) * 2 - 1;
-    }
-
-    ico.addEventListener('pointerdown', beginDrag);
-    ico.addEventListener('pointermove', updateDrag);
-    window.addEventListener('pointermove', updateDrag, { passive: true });
-    window.addEventListener('pointermove', updateBookPointer, { passive: true });
-    window.addEventListener('pointerleave', () => {
-      bookPointer.active = false;
-    });
-    window.addEventListener('blur', () => {
-      bookPointer.active = false;
-    });
-    ico.addEventListener('pointerup', endDrag);
-    ico.addEventListener('pointercancel', endDrag);
-    ico.addEventListener('lostpointercapture', (e) => {
-      if (dragPointerId === e.pointerId) {
-        dragPointerId = null;
-        resetDragOffsets();
-      }
-    });
-
-    function animate(now) {
-      const dt = Math.max(0.55, Math.min(2.1, (now - lastTick) / 16.67));
-      lastTick = now;
-      yaw += spinSpeed * dt;
-      render();
-      requestAnimationFrame(animate);
-    }
-
-    function render() {
-      const now = performance.now();
-      const t = now / 1000;
-      const isReturning = dragPointerId === null;
-      const follow = isReturning ? 0.045 : 0.35;
-      const yawDelta = Math.atan2(
-        Math.sin(targetYawOffset - smoothYawOffset),
-        Math.cos(targetYawOffset - smoothYawOffset)
-      );
-      smoothYawOffset += yawDelta * follow;
-      smoothPitchOffset += (targetPitchOffset - smoothPitchOffset) * follow;
-
-      world.rotation.set(smoothPitchOffset * 0.35, yaw + smoothYawOffset, 0);
-
-      const idleLookX = Math.sin(t * 0.58) * 0.2;
-      const idleLookY = Math.cos(t * 0.45) * 0.12;
-      const targetLookX = bookPointer.active ? bookPointer.x : idleLookX;
-      const targetLookY = bookPointer.active ? bookPointer.y : idleLookY;
-      const lookEase = bookPointer.active ? 0.115 : 0.05;
-      smoothBookPointer.x += (targetLookX - smoothBookPointer.x) * lookEase;
-      smoothBookPointer.y += (targetLookY - smoothBookPointer.y) * lookEase;
-
-      bookHover.position.y = 0.55 + Math.sin(t * 2.15) * 0.038;
-      const targetBookYaw = smoothBookPointer.x * 1.28 + Math.sin(t * 0.62) * 0.04;
-      const targetBookPitch = 0.4 - smoothBookPointer.y * 0.42 + Math.sin(t * 1.65) * 0.025;
-      bookYaw.rotation.y += (targetBookYaw - bookYaw.rotation.y) * 0.14;
-      bookTilt.rotation.x += (targetBookPitch - bookTilt.rotation.x) * 0.12;
-
-      const openAngle = 1.02 + Math.sin(t * 1.55) * 0.09 + Math.min(0.22, Math.abs(smoothBookPointer.x) * 0.34);
-      const pageSkew = smoothBookPointer.x * 0.28;
-      leftCoverPivot.rotation.y += (openAngle - leftCoverPivot.rotation.y) * 0.16;
-      rightCoverPivot.rotation.y += (-openAngle - rightCoverPivot.rotation.y) * 0.16;
-      leftPage.rotation.y += ((openAngle * 0.62 + pageSkew) - leftPage.rotation.y) * 0.14;
-      rightPage.rotation.y += ((-openAngle * 0.62 + pageSkew) - rightPage.rotation.y) * 0.14;
-
-      renderer.render(scene, camera);
-    }
-    render();
-
-    function onResize() {
-      const w = ico.clientWidth || width;
-      const h = ico.clientHeight || height;
-      const dw = Math.round(w * overscan);
-      const dh = Math.round(h * overscan);
-      camera.aspect = dw / dh;
-      camera.updateProjectionMatrix();
-      renderer.setSize(dw, dh);
-      render();
-    }
-    window.addEventListener('resize', onResize);
-  }
+  const img = document.createElement('img');
+  img.src = '/src/Enchanting_Table.gif';
+  img.alt = '';
+  img.setAttribute('aria-hidden', 'true');
+  img.draggable = false;
+  ico.textContent = '';
+  ico.appendChild(img);
 })();
 
 (function calModal() {
