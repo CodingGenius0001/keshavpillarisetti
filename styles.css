@@ -1000,7 +1000,16 @@ footer a:hover {
 
   .hero-line {
     font-size: clamp(0.95rem, 4.2vw, 1.34rem);
+    font-weight: 700;
     gap: 0.45rem;
+  }
+
+  #typewriter {
+    font-weight: 700;
+  }
+
+  .eyebrow {
+    font-weight: 600;
   }
 
   .text-glass-hero {
@@ -1141,6 +1150,7 @@ footer a:hover {
 
   .hero-line {
     font-size: clamp(0.88rem, 5.5vw, 1.16rem);
+    font-weight: 700;
     gap: 0.32rem;
     line-height: 1.2;
   }
