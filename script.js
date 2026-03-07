@@ -14,11 +14,13 @@
   function closeMenu() {
     topbar.classList.remove('menu-open');
     toggle.setAttribute('aria-expanded', 'false');
+    document.body.classList.remove('nav-open');
   }
 
   function openMenu() {
     topbar.classList.add('menu-open');
     toggle.setAttribute('aria-expanded', 'true');
+    document.body.classList.add('nav-open');
   }
 
   toggle.addEventListener('click', () => {
