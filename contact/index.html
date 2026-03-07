@@ -10,11 +10,17 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap">
   <link rel="stylesheet" href="/styles.css">
 </head>
-<body>
-  <div class="container">
-    <header class="fade-in">
-      <a href="/" class="site-title">Keshav Pillarisetti</a>
-      <nav>
+<body class="home inner-page">
+  <div class="bg-canvas-wrap" aria-hidden="true">
+    <canvas id="pixelCanvas"></canvas>
+    <div class="bg-gradient"></div>
+  </div>
+
+  <div class="page-shell">
+    <header class="topbar">
+      <a class="top-name" href="/" aria-label="Keshav Pillarisetti home">Keshav Pillarisetti</a>
+      <button class="nav-menu-toggle" id="navMenuToggle" type="button" aria-label="toggle navigation" aria-controls="topNavLinks" aria-expanded="false">&#9776;</button>
+      <nav class="nav-links" id="topNavLinks">
         <a href="/">home</a>
         <a href="/about/">about</a>
         <a href="/skills/">skills</a>
@@ -24,6 +30,7 @@
       </nav>
     </header>
 
+    <div class="inner-content">
     <main>
       <section class="hero fade-in">
         <h1 class="hero-heading">Contact</h1>
@@ -60,6 +67,7 @@
     <footer class="fade-in">
       <p>&copy; 2026 Keshav Pillarisetti &middot; <a href="mailto:pkeshav.business@gmail.com">pkeshav.business@gmail.com</a></p>
     </footer>
+    </div>
   </div>
 
   <script src="/script.js"></script>

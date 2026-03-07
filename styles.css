@@ -118,6 +118,16 @@ body.modal-open {
   color: var(--home-text);
 }
 
+body.inner-page {
+  overflow: auto;
+}
+
+.inner-content {
+  width: min(720px, 92%);
+  margin: 0 auto;
+  padding-bottom: 3rem;
+}
+
 .home .eyebrow,
 .home .hero-line,
 .home #typewriter,

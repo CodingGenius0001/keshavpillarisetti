@@ -10,11 +10,17 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap">
   <link rel="stylesheet" href="/styles.css">
 </head>
-<body>
-  <div class="container">
-    <header class="fade-in">
-      <a href="/" class="site-title">Keshav Pillarisetti</a>
-      <nav>
+<body class="home inner-page">
+  <div class="bg-canvas-wrap" aria-hidden="true">
+    <canvas id="pixelCanvas"></canvas>
+    <div class="bg-gradient"></div>
+  </div>
+
+  <div class="page-shell">
+    <header class="topbar">
+      <a class="top-name" href="/" aria-label="Keshav Pillarisetti home">Keshav Pillarisetti</a>
+      <button class="nav-menu-toggle" id="navMenuToggle" type="button" aria-label="toggle navigation" aria-controls="topNavLinks" aria-expanded="false">&#9776;</button>
+      <nav class="nav-links" id="topNavLinks">
         <a href="/">home</a>
         <a href="/about/" aria-current="page">about</a>
         <a href="/skills/">skills</a>
@@ -24,34 +30,36 @@
       </nav>
     </header>
 
-    <main>
-      <section class="hero fade-in">
-        <h1 class="hero-heading">About Me</h1>
-        <p class="hero-text">I'm passionate about solving real-world problems with technology and creating solutions that are simple, useful, and polished.</p>
-      </section>
+    <div class="inner-content">
+      <main>
+        <section class="hero fade-in">
+          <h1 class="hero-heading">About Me</h1>
+          <p class="hero-text">I'm passionate about solving real-world problems with technology and creating solutions that are simple, useful, and polished.</p>
+        </section>
 
-      <div class="about-content fade-in">
-        <p>I enjoy the process of turning ideas into real, working products — from the initial concept all the way through to a polished experience. Whether it's designing intuitive interfaces or writing clean backend logic, I care about every detail.</p>
-        <p>I'm driven by curiosity and a desire to keep learning. I believe great software comes from understanding people first, then building technology that serves them well.</p>
-      </div>
+        <div class="about-content fade-in">
+          <p>I enjoy the process of turning ideas into real, working products — from the initial concept all the way through to a polished experience. Whether it's designing intuitive interfaces or writing clean backend logic, I care about every detail.</p>
+          <p>I'm driven by curiosity and a desire to keep learning. I believe great software comes from understanding people first, then building technology that serves them well.</p>
+        </div>
 
-      <p class="section-label fade-in">My Approach</p>
+        <p class="section-label fade-in">My Approach</p>
 
-      <section class="grid" aria-label="Approach">
-        <article class="card fade-in">
-          <h3>What Drives Me</h3>
-          <p>Curiosity, craftsmanship, and a deep commitment to delivering meaningful user experiences that make a difference.</p>
-        </article>
-        <article class="card fade-in">
-          <h3>How I Work</h3>
-          <p>Collaborative, iterative, and quality-focused — from early concept through to deployment and beyond.</p>
-        </article>
-      </section>
-    </main>
+        <section class="grid" aria-label="Approach">
+          <article class="card fade-in">
+            <h3>What Drives Me</h3>
+            <p>Curiosity, craftsmanship, and a deep commitment to delivering meaningful user experiences that make a difference.</p>
+          </article>
+          <article class="card fade-in">
+            <h3>How I Work</h3>
+            <p>Collaborative, iterative, and quality-focused — from early concept through to deployment and beyond.</p>
+          </article>
+        </section>
+      </main>
 
-    <footer class="fade-in">
-      <p>&copy; 2026 Keshav Pillarisetti &middot; <a href="mailto:pkeshav.business@gmail.com">pkeshav.business@gmail.com</a></p>
-    </footer>
+      <footer class="fade-in">
+        <p>&copy; 2026 Keshav Pillarisetti &middot; <a href="mailto:pkeshav.business@gmail.com">pkeshav.business@gmail.com</a></p>
+      </footer>
+    </div>
   </div>
 
   <script src="/script.js"></script>

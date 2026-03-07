@@ -10,11 +10,17 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap">
   <link rel="stylesheet" href="/styles.css">
 </head>
-<body>
-  <div class="container">
-    <header class="fade-in">
-      <a href="/" class="site-title">Keshav Pillarisetti</a>
-      <nav>
+<body class="home inner-page">
+  <div class="bg-canvas-wrap" aria-hidden="true">
+    <canvas id="pixelCanvas"></canvas>
+    <div class="bg-gradient"></div>
+  </div>
+
+  <div class="page-shell">
+    <header class="topbar">
+      <a class="top-name" href="/" aria-label="Keshav Pillarisetti home">Keshav Pillarisetti</a>
+      <button class="nav-menu-toggle" id="navMenuToggle" type="button" aria-label="toggle navigation" aria-controls="topNavLinks" aria-expanded="false">&#9776;</button>
+      <nav class="nav-links" id="topNavLinks">
         <a href="/">home</a>
         <a href="/about/">about</a>
         <a href="/skills/" aria-current="page">skills</a>
@@ -24,63 +30,65 @@
       </nav>
     </header>
 
-    <main>
-      <section class="hero fade-in">
-        <h1 class="hero-heading">Skills</h1>
-        <p class="hero-text">I work across design, development, and delivery — with a strong focus on usability and reliability.</p>
-      </section>
+    <div class="inner-content">
+      <main>
+        <section class="hero fade-in">
+          <h1 class="hero-heading">Skills</h1>
+          <p class="hero-text">I work across design, development, and delivery — with a strong focus on usability and reliability.</p>
+        </section>
 
-      <p class="section-label fade-in">Technical</p>
+        <p class="section-label fade-in">Technical</p>
 
-      <section class="grid" aria-label="Technical skills">
-        <article class="card fade-in">
-          <h3>Frontend</h3>
-          <p>Building responsive, accessible, and performance-aware interfaces.</p>
-          <div class="skill-tag-group">
-            <span class="skill-tag">HTML / CSS</span>
-            <span class="skill-tag">Responsive Design</span>
-            <span class="skill-tag">Accessibility</span>
-            <span class="skill-tag">UI / UX</span>
-          </div>
-        </article>
-        <article class="card fade-in">
-          <h3>Backend &amp; Logic</h3>
-          <p>Handling data, integrating APIs, and shipping reliable features.</p>
-          <div class="skill-tag-group">
-            <span class="skill-tag">API Integration</span>
-            <span class="skill-tag">Data Handling</span>
-            <span class="skill-tag">Testing</span>
-            <span class="skill-tag">Debugging</span>
-          </div>
-        </article>
-      </section>
+        <section class="grid" aria-label="Technical skills">
+          <article class="card fade-in">
+            <h3>Frontend</h3>
+            <p>Building responsive, accessible, and performance-aware interfaces.</p>
+            <div class="skill-tag-group">
+              <span class="skill-tag">HTML / CSS</span>
+              <span class="skill-tag">Responsive Design</span>
+              <span class="skill-tag">Accessibility</span>
+              <span class="skill-tag">UI / UX</span>
+            </div>
+          </article>
+          <article class="card fade-in">
+            <h3>Backend &amp; Logic</h3>
+            <p>Handling data, integrating APIs, and shipping reliable features.</p>
+            <div class="skill-tag-group">
+              <span class="skill-tag">API Integration</span>
+              <span class="skill-tag">Data Handling</span>
+              <span class="skill-tag">Testing</span>
+              <span class="skill-tag">Debugging</span>
+            </div>
+          </article>
+        </section>
 
-      <p class="section-label fade-in">Delivery</p>
+        <p class="section-label fade-in">Delivery</p>
 
-      <section class="grid" aria-label="Delivery skills">
-        <article class="card fade-in">
-          <h3>Process</h3>
-          <p>Iterative development with a focus on collaboration and quality.</p>
-          <div class="skill-tag-group">
-            <span class="skill-tag">Agile Workflow</span>
-            <span class="skill-tag">Version Control</span>
-            <span class="skill-tag">Code Review</span>
-          </div>
-        </article>
-        <article class="card fade-in">
-          <h3>Resume</h3>
-          <p>Download my latest resume for a complete overview.</p>
-          <a class="resume-link" href="/src/Keshav%20Pillarisetti%20-%20Resume.pdf" download>
-            <span class="resume-icon" aria-hidden="true">↓</span>
-            <span>Download Resume</span>
-          </a>
-        </article>
-      </section>
-    </main>
+        <section class="grid" aria-label="Delivery skills">
+          <article class="card fade-in">
+            <h3>Process</h3>
+            <p>Iterative development with a focus on collaboration and quality.</p>
+            <div class="skill-tag-group">
+              <span class="skill-tag">Agile Workflow</span>
+              <span class="skill-tag">Version Control</span>
+              <span class="skill-tag">Code Review</span>
+            </div>
+          </article>
+          <article class="card fade-in">
+            <h3>Resume</h3>
+            <p>Download my latest resume for a complete overview.</p>
+            <a class="resume-link" href="/src/Keshav%20Pillarisetti%20-%20Resume.pdf" download>
+              <span class="resume-icon" aria-hidden="true">↓</span>
+              <span>Download Resume</span>
+            </a>
+          </article>
+        </section>
+      </main>
 
-    <footer class="fade-in">
-      <p>&copy; 2026 Keshav Pillarisetti &middot; <a href="mailto:pkeshav.business@gmail.com">pkeshav.business@gmail.com</a></p>
-    </footer>
+      <footer class="fade-in">
+        <p>&copy; 2026 Keshav Pillarisetti &middot; <a href="mailto:pkeshav.business@gmail.com">pkeshav.business@gmail.com</a></p>
+      </footer>
+    </div>
   </div>
 
   <script src="/script.js"></script>
