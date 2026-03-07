@@ -1009,7 +1009,7 @@ footer a:hover {
   }
 
   .eyebrow {
-    font-weight: 600;
+    font-weight: 700;
   }
 
   .text-glass-hero {
@@ -1023,6 +1023,7 @@ footer a:hover {
 
   .cta {
     padding: 0.62rem 1rem;
+    font-weight: 700;
   }
 
   .cal-modal-panel {
@@ -1155,6 +1156,10 @@ footer a:hover {
     line-height: 1.2;
   }
 
+  .eyebrow {
+    font-weight: 700;
+  }
+
   .text-glass-eyebrow {
     padding: 0.17rem 0.6rem;
   }
@@ -1181,6 +1186,7 @@ footer a:hover {
     width: 100%;
     padding: 0.58rem 0.7rem;
     font-size: 0.9rem;
+    font-weight: 700;
     min-height: 42px;
   }
 
