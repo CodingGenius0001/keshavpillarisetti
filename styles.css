@@ -35,35 +35,35 @@
 }
 
 [data-theme="dark"] {
-  --bg: #0f172a;
-  --bg-alt: #1e293b;
-  --surface: #1e293b;
-  --text: #f1f5f9;
-  --text-secondary: #cbd5e1;
-  --muted: #94a3b8;
-  --primary: #3b82f6;
-  --primary-light: #60a5fa;
-  --primary-subtle: rgba(59, 130, 246, 0.12);
-  --accent: #93bbfd;
-  --border: rgba(255, 255, 255, 0.08);
-  --border-hover: rgba(59, 130, 246, 0.4);
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.2);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.2);
-  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.3);
-  --home-bg: #2a2f36;
-  --home-text: #eef3f8;
-  --home-nav: rgba(236, 243, 250, 0.84);
+  --bg: #080f1e;
+  --bg-alt: #0d1a30;
+  --surface: #0d1a30;
+  --text: #e4eeff;
+  --text-secondary: #a0b8d8;
+  --muted: #5a7a9e;
+  --primary: #4a9eff;
+  --primary-light: #6eb5ff;
+  --primary-subtle: rgba(74, 158, 255, 0.12);
+  --accent: #7ec8ff;
+  --border: rgba(100, 160, 255, 0.14);
+  --border-hover: rgba(74, 158, 255, 0.45);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 16px rgba(0, 10, 40, 0.3);
+  --shadow-lg: 0 8px 32px rgba(0, 10, 40, 0.4);
+  --home-bg: #0e1828;
+  --home-text: #dceeff;
+  --home-nav: rgba(200, 225, 255, 0.84);
   --home-nav-hover-text: #ffffff;
-  --home-nav-hover-bg: rgba(255, 255, 255, 0.12);
-  --home-nav-active-bg: rgba(255, 255, 255, 0.16);
-  --home-nav-border: rgba(255, 255, 255, 0.08);
-  --home-nav-active-border: rgba(255, 255, 255, 0.24);
-  --home-top-border: rgba(255, 255, 255, 0.14);
-  --home-grad-1: rgba(255, 255, 255, 0.09);
-  --home-grad-2: rgba(200, 230, 255, 0.06);
-  --home-grad-3: rgba(180, 220, 255, 0.04);
-  --home-grad-4a: rgba(30, 35, 42, 0.4);
-  --home-grad-4b: rgba(35, 41, 49, 0.34);
+  --home-nav-hover-bg: rgba(74, 158, 255, 0.14);
+  --home-nav-active-bg: rgba(74, 158, 255, 0.2);
+  --home-nav-border: rgba(100, 160, 255, 0.18);
+  --home-nav-active-border: rgba(74, 158, 255, 0.45);
+  --home-top-border: rgba(100, 160, 255, 0.18);
+  --home-grad-1: rgba(74, 120, 255, 0.14);
+  --home-grad-2: rgba(60, 140, 255, 0.09);
+  --home-grad-3: rgba(40, 110, 255, 0.06);
+  --home-grad-4a: rgba(6, 14, 36, 0.55);
+  --home-grad-4b: rgba(8, 18, 44, 0.45);
 }
 
 /* ===== RESET ===== */
