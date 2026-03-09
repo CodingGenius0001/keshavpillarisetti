@@ -8,7 +8,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap">
-  <link rel="stylesheet" href="/styles.css">
+  <base href="../">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body class="home inner-page">
   <div class="bg-canvas-wrap" aria-hidden="true">
@@ -18,15 +19,15 @@
 
   <div class="page-shell">
     <header class="topbar">
-      <a class="top-name" href="/" aria-label="Keshav Pillarisetti home">Keshav Pillarisetti</a>
+      <a class="top-name" href="./" aria-label="Keshav Pillarisetti home">Keshav Pillarisetti</a>
       <button class="nav-menu-toggle" id="navMenuToggle" type="button" aria-label="toggle navigation" aria-controls="topNavLinks" aria-expanded="false">&#9776;</button>
       <nav class="nav-links" id="topNavLinks">
-        <a href="/">home</a>
-        <a href="/about/">about</a>
-        <a href="/skills/">skills</a>
-        <a href="/projects/">projects</a>
-        <a href="/blog/" aria-current="page">blog</a>
-        <a href="/contact/">contact</a>
+        <a href="./">home</a>
+        <a href="about/">about</a>
+        <a href="skills/">skills</a>
+        <a href="projects/">projects</a>
+        <a href="blog/" aria-current="page">blog</a>
+        <a href="contact/">contact</a>
       </nav>
     </header>
 
@@ -43,9 +44,9 @@
 
         <article class="card fade-in" style="margin-bottom: 1rem;">
           <p class="post-meta">Mar 7, 2026</p>
-          <h3><a href="/blog/hello-world/" class="card-link">Hello, World</a></h3>
+          <h3><a href="blog/hello-world/" class="card-link">Hello, World</a></h3>
           <p>First post — a quick intro to who I am, what this blog is about, and what to expect.</p>
-          <a href="/blog/hello-world/" class="cta" style="margin-top: 0.75rem; display: inline-flex;">read &rarr;</a>
+          <a href="blog/hello-world/" class="cta" style="margin-top: 0.75rem; display: inline-flex;">read &rarr;</a>
         </article>
 
         <article class="card fade-in" style="margin-bottom: 1rem;">
@@ -63,6 +64,6 @@
     </div>
   </div>
 
-  <script src="/script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
