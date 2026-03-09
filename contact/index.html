@@ -8,7 +8,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap">
-  <link rel="stylesheet" href="/styles.css">
+  <base href="../">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body class="home inner-page">
   <div class="bg-canvas-wrap" aria-hidden="true">
@@ -18,15 +19,15 @@
 
   <div class="page-shell">
     <header class="topbar">
-      <a class="top-name" href="/" aria-label="Keshav Pillarisetti home">Keshav Pillarisetti</a>
+      <a class="top-name" href="./" aria-label="Keshav Pillarisetti home">Keshav Pillarisetti</a>
       <button class="nav-menu-toggle" id="navMenuToggle" type="button" aria-label="toggle navigation" aria-controls="topNavLinks" aria-expanded="false">&#9776;</button>
       <nav class="nav-links" id="topNavLinks">
-        <a href="/">home</a>
-        <a href="/about/">about</a>
-        <a href="/skills/">skills</a>
-        <a href="/projects/">projects</a>
-        <a href="/blog/">blog</a>
-        <a href="/contact/" aria-current="page">contact</a>
+        <a href="./">home</a>
+        <a href="about/">about</a>
+        <a href="skills/">skills</a>
+        <a href="projects/">projects</a>
+        <a href="blog/">blog</a>
+        <a href="contact/" aria-current="page">contact</a>
       </nav>
     </header>
 
@@ -44,7 +45,7 @@
           <a class="cta" href="https://mail.google.com/mail/?view=cm&fs=1&to=pkeshav.business@gmail.com" target="_blank" rel="noreferrer">email</a>
           <a class="cta" href="https://x.com/_keshavp" target="_blank" rel="noreferrer">twitter</a>
           <a class="cta" href="https://github.com/CodingGenius0001" target="_blank" rel="noreferrer">github</a>
-          <a class="cta primary" href="/contact/#book" id="bookCallBtn" type="button">book a call</a>
+          <a class="cta primary" href="contact/#book" id="bookCallBtn" type="button">book a call</a>
         </div>
       </section>
 
@@ -52,10 +53,10 @@
 
       <section class="card fade-in">
         <p style="margin-bottom: 1rem; color: var(--text-secondary);">View my resume below, or download it directly.</p>
-        <a class="cta" href="/src/Keshav%20Pillarisetti%20-%20Resume.pdf" download style="margin-bottom: 1.25rem; display: inline-flex;">download resume</a>
+        <a class="cta" href="src/Keshav%20Pillarisetti%20-%20Resume.pdf" download style="margin-bottom: 1.25rem; display: inline-flex;">download resume</a>
         <div class="resume-embed">
           <iframe
-            src="/src/Keshav%20Pillarisetti%20-%20Resume.pdf"
+            src="src/Keshav%20Pillarisetti%20-%20Resume.pdf"
             title="Keshav Pillarisetti Resume"
             aria-label="Resume PDF viewer"
           ></iframe>
@@ -70,6 +71,6 @@
     </div>
   </div>
 
-  <script src="/script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>

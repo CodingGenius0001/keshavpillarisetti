@@ -8,7 +8,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap">
-  <link rel="stylesheet" href="/styles.css">
+  <base href="../">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body class="home inner-page">
   <div class="bg-canvas-wrap" aria-hidden="true">
@@ -18,15 +19,15 @@
 
   <div class="page-shell">
     <header class="topbar">
-      <a class="top-name" href="/" aria-label="Keshav Pillarisetti home">Keshav Pillarisetti</a>
+      <a class="top-name" href="./" aria-label="Keshav Pillarisetti home">Keshav Pillarisetti</a>
       <button class="nav-menu-toggle" id="navMenuToggle" type="button" aria-label="toggle navigation" aria-controls="topNavLinks" aria-expanded="false">&#9776;</button>
       <nav class="nav-links" id="topNavLinks">
-        <a href="/">home</a>
-        <a href="/about/">about</a>
-        <a href="/skills/" aria-current="page">skills</a>
-        <a href="/projects/">projects</a>
-        <a href="/blog/">blog</a>
-        <a href="/contact/">contact</a>
+        <a href="./">home</a>
+        <a href="about/">about</a>
+        <a href="skills/" aria-current="page">skills</a>
+        <a href="projects/">projects</a>
+        <a href="blog/">blog</a>
+        <a href="contact/">contact</a>
       </nav>
     </header>
 
@@ -77,7 +78,7 @@
           <article class="card fade-in">
             <h3>Resume</h3>
             <p>Download my latest resume for a complete overview.</p>
-            <a class="resume-link" href="/src/Keshav%20Pillarisetti%20-%20Resume.pdf" download>
+            <a class="resume-link" href="src/Keshav%20Pillarisetti%20-%20Resume.pdf" download>
               <span class="resume-icon" aria-hidden="true">↓</span>
               <span>Download Resume</span>
             </a>
@@ -91,6 +92,6 @@
     </div>
   </div>
 
-  <script src="/script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>

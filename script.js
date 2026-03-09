@@ -1,3 +1,5 @@
+const resolveSiteUrl = (path) => new URL(path, document.baseURI).href;
+
 (function () {
   const root = document.documentElement;
   root.setAttribute('data-theme', 'dark');
@@ -167,13 +169,13 @@
     img.onload = () => {
       tintedLeafTextures[i] = buildTintedLeaf(img);
     };
-    img.src = `/src/cherry_${i}.png`;
+    img.src = resolveSiteUrl(`src/cherry_${i}.png`);
     leafTextures.push(img);
     tintedLeafTextures.push(null);
   }
 
   const orbImg = new Image();
-  orbImg.src = '/src/experienceorb.png';
+  orbImg.src = resolveSiteUrl('src/experienceorb.png');
 
   function resize() {
     canvas.width = window.innerWidth;
@@ -350,7 +352,7 @@
   if (!ico) return;
 
   const img = document.createElement('img');
-  img.src = '/src/Enchanting_Table.gif';
+  img.src = resolveSiteUrl('src/Enchanting_Table.gif');
   img.alt = '';
   img.setAttribute('aria-hidden', 'true');
   img.draggable = false;
