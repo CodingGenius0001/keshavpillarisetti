@@ -770,6 +770,11 @@ nav a[aria-current="page"] {
   margin-bottom: 2rem;
 }
 
+.projects-grid {
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
 .card {
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid var(--border);
