@@ -1,4 +1,27 @@
 const resolveSiteUrl = (path) => new URL(path, document.baseURI).href;
+const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const prefersLightweightMode = () => {
+  const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+  if (!connection) return false;
+  const effectiveType = connection.effectiveType || '';
+  return Boolean(connection.saveData || effectiveType.includes('2g'));
+};
+const afterWindowLoad = (callback) => {
+  if (document.readyState === 'complete') {
+    callback();
+    return;
+  }
+  window.addEventListener('load', callback, { once: true });
+};
+const scheduleNonCritical = (callback, timeout = 1200) => {
+  afterWindowLoad(() => {
+    if ('requestIdleCallback' in window) {
+      window.requestIdleCallback(() => callback(), { timeout });
+    } else {
+      window.setTimeout(callback, 220);
+    }
+  });
+};
 
 (function () {
   const root = document.documentElement;
@@ -72,6 +95,11 @@ const resolveSiteUrl = (path) => new URL(path, document.baseURI).href;
     'builder'
   ];
 
+  if (prefersReducedMotion()) {
+    el.textContent = words[0];
+    return;
+  }
+
   let wordIndex = 0;
   let charIndex = 0;
   let deleting = false;
@@ -108,6 +136,9 @@ const resolveSiteUrl = (path) => new URL(path, document.baseURI).href;
   const canvas = document.getElementById('pixelCanvas');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+  if (document.body.classList.contains('inner-page') || prefersReducedMotion() || prefersLightweightMode()) return;
+
   const orbs = [];
   const leaves = [];
   const pointer = { x: null, y: null };
@@ -115,13 +146,17 @@ const resolveSiteUrl = (path) => new URL(path, document.baseURI).href;
   const getMotionProfile = () => {
     const mobile = window.innerWidth <= 768;
     return {
-      orbCount: mobile ? 5 : 10,
-      leafMax: mobile ? 12 : 24,
-      leafSpawnChance: mobile ? 0.0045 : 0.008,
-      orbDrift: mobile ? 0.72 : 0.9
+      orbCount: mobile ? 3 : 7,
+      leafMax: mobile ? 6 : 14,
+      leafSpawnChance: mobile ? 0.0022 : 0.0045,
+      orbDrift: mobile ? 0.48 : 0.72
     };
   };
   let motion = getMotionProfile();
+  let rafId = 0;
+  let running = false;
+  let initialized = false;
+  let texturesLoaded = false;
   const ORB_BASE_FRAMES_8 = [
     ['00011000', '00132200', '01322310', '12222321', '12222321', '01322310', '00132200', '00011000'],
     ['00011000', '00133300', '01322310', '12222321', '12222321', '01322210', '00132200', '00011000'],
@@ -137,6 +172,7 @@ const resolveSiteUrl = (path) => new URL(path, document.baseURI).href;
   );
   const leafTextures = [];
   const tintedLeafTextures = [];
+  const orbImg = new Image();
 
   function buildTintedLeaf(img) {
     const width = img.naturalWidth || img.width;
@@ -164,18 +200,24 @@ const resolveSiteUrl = (path) => new URL(path, document.baseURI).href;
     return offscreen;
   }
 
-  for (let i = 0; i < 12; i += 1) {
-    const img = new Image();
-    img.onload = () => {
-      tintedLeafTextures[i] = buildTintedLeaf(img);
-    };
-    img.src = resolveSiteUrl(`src/cherry_${i}.png`);
-    leafTextures.push(img);
-    tintedLeafTextures.push(null);
-  }
+  function loadTextures() {
+    if (texturesLoaded) return;
+    texturesLoaded = true;
 
-  const orbImg = new Image();
-  orbImg.src = resolveSiteUrl('src/experienceorb.png');
+    for (let i = 0; i < 12; i += 1) {
+      const img = new Image();
+      img.decoding = 'async';
+      img.onload = () => {
+        tintedLeafTextures[i] = buildTintedLeaf(img);
+      };
+      img.src = resolveSiteUrl(`src/cherry_${i}.png`);
+      leafTextures.push(img);
+      tintedLeafTextures.push(null);
+    }
+
+    orbImg.decoding = 'async';
+    orbImg.src = resolveSiteUrl('src/experienceorb.png');
+  }
 
   function resize() {
     canvas.width = window.innerWidth;
@@ -262,6 +304,8 @@ const resolveSiteUrl = (path) => new URL(path, document.baseURI).href;
   }
 
   function draw(time) {
+    if (!running) return;
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.imageSmoothingEnabled = false;
     const t = (time || 0) / 1000;
@@ -322,12 +366,33 @@ const resolveSiteUrl = (path) => new URL(path, document.baseURI).href;
       }
     });
 
-    requestAnimationFrame(draw);
+    if (!running) return;
+    rafId = window.requestAnimationFrame(draw);
   }
 
-  resize();
-  seedOrbs();
-  draw();
+  function start() {
+    loadTextures();
+    resize();
+    if (!initialized) {
+      motion = getMotionProfile();
+      seedOrbs();
+      initialized = true;
+    }
+    document.body.classList.add('effects-ready');
+    if (running) return;
+    running = true;
+    rafId = window.requestAnimationFrame(draw);
+  }
+
+  function stop() {
+    running = false;
+    if (rafId) {
+      window.cancelAnimationFrame(rafId);
+      rafId = 0;
+    }
+  }
+
+  scheduleNonCritical(start, 1400);
   window.addEventListener('resize', () => {
     resize();
     motion = getMotionProfile();
@@ -345,19 +410,16 @@ const resolveSiteUrl = (path) => new URL(path, document.baseURI).href;
     pointer.x = null;
     pointer.y = null;
   });
-})();
 
-(function heroEnchantingTable() {
-  const ico = document.getElementById('heroIcosa');
-  if (!ico) return;
-
-  const img = document.createElement('img');
-  img.src = resolveSiteUrl('src/Enchanting_Table.gif');
-  img.alt = '';
-  img.setAttribute('aria-hidden', 'true');
-  img.draggable = false;
-  ico.textContent = '';
-  ico.appendChild(img);
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      stop();
+      return;
+    }
+    if (initialized) {
+      start();
+    }
+  });
 })();
 
 (function calModal() {
